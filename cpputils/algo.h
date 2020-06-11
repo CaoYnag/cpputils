@@ -2,7 +2,7 @@
 #include <iostream>
 #include <functional>
 
-namespace spes::utils::algo
+namespace spes::algo
 {
 	template<class T>
 	void showArr(T* arr, int size)

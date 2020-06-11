@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(test_algo)
+project(test_math)
 
 if(WIN32)
 	if($ENV{LIB_BASE})
@@ -13,12 +13,9 @@ if(WIN32)
 		)
 	endif()
 
-	if($ENV{Boost_ROOT})
-		message(FATAL_ERROR "env Boost_ROOT not set")
-	else()
-		include_directories(
-			$ENV{Boost_ROOT}/
-		)
+	find_package(Boost 1.67 COMPONENTS)
+	if(Boost_FOUND)
+		include_directories(${Boost_INCLUDE_DIRS})
 	endif()
 endif()
 
@@ -26,5 +23,5 @@ set(SRC
     ${PROJECT_SOURCE_DIR}/test.cpp
 )
 
-add_executable(test_algo ${SRC})
-target_link_libraries(test_algo utils)
+add_executable(test_math ${SRC})
+target_link_libraries(test_math utils)

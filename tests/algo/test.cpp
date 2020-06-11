@@ -1,7 +1,7 @@
 ﻿#include <iostream>
 #include "../../cpputils/algo.h"
 using namespace std;
-using namespace spes::utils::algo;
+using namespace spes::algo;
 
 int main()
 {

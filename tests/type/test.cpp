@@ -1,0 +1,19 @@
+﻿#define BOOST_TEST_MODULE test_types
+#include <iostream>
+#include <boost/test/included/unit_test.hpp>
+#include "../../cpputils/type.h"
+using namespace std;
+using namespace spes;
+
+BOOST_AUTO_TEST_CASE(EnvTest)
+{
+	BOOST_REQUIRE_EQUAL(sizeof(i8), 1);
+	BOOST_REQUIRE_EQUAL(sizeof(i16), 2);
+	BOOST_REQUIRE_EQUAL(sizeof(i32), 4);
+	BOOST_REQUIRE_EQUAL(sizeof(i64), 8);
+
+	BOOST_REQUIRE_EQUAL(sizeof(u8), 1);
+	BOOST_REQUIRE_EQUAL(sizeof(u16), 2);
+	BOOST_REQUIRE_EQUAL(sizeof(u32), 4);
+	BOOST_REQUIRE_EQUAL(sizeof(u64), 8);
+}

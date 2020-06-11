@@ -11,7 +11,7 @@ link_directories(
 if(WIN32 AND NOT MINGW)
 	add_compile_options("/std:c++latest")
 	add_compile_options("/Zc:__cplusplus") # bugs in vs for nlohmann json
-	add_definitions(-DNOMINMAX) # cancel min max macro in vs17
+	add_definitions(-DNOMINMAX -D_CRT_SECURE_NO_WARNINGS) # cancel min max macro in vs17
 	
 	set(CMAKE_DEBUG_POSTFIX "_d")
 endif()
