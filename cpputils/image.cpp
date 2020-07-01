@@ -3,8 +3,13 @@
 
 namespace spes::image
 {
-	image_t::image_t() : _init(false)
-	{}
+	image_t::image_t() : _init(false), _buff(nullptr)
+	{
+	}
+	image_t::image_t(const image_t& im) : _init(false), _buff(nullptr)
+	{
+		init(im);
+	}
 	void image_t::init(u32 w, u32 h)
 	{
 		init(w, h, nullptr);

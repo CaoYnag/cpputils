@@ -18,6 +18,7 @@ namespace spes::image
 		}
 	public:
 		image_t();
+		image_t(const image_t&);
 		virtual ~image_t();
 
 		void init(u32, u32);
@@ -32,7 +33,7 @@ namespace spes::image
 		{
 			return _h;
 		}
-		inline color_t* buffer();
+		inline color_t* buffer() { return _buff; }
 
 		color_t get_pixel(int x, int y) const;
 		void set_pixel(int x, int y, color_t  c);

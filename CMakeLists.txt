@@ -21,3 +21,18 @@ endif()
 
 add_subdirectory(cpputils)
 add_subdirectory(tests)
+install(TARGETS utils 
+	LIBRARY DESTINATION lib
+	RUNTIME DESTINATION bin)
+install(FILES 
+	cpputils/type.h
+	cpputils/algo.h
+	cpputils/math.h
+	cpputils/color.h
+	cpputils/image.h
+	cpputils/io_png.h
+	cpputils/imageio.h
+	cpputils/canvas.h
+	cpputils/canvas_func.h
+	DESTINATION include/spes
+)

@@ -1,5 +1,9 @@
 #pragma once
 #include "image.h"
+#include "math.h"
+#include <string>
+using namespace spes;
+using namespace spes::math;
 using namespace spes::image;
 
 namespace spes::image::io
@@ -10,10 +14,34 @@ namespace spes::image::io
 		IMAGE_FMT_JPG,
 		IMAGE_FMT_PNG
 	};
+
+	class ImageViewer
+	{
+	protected:
+		image_t& _im;
+		size2di _sz;
+		std::string _tt;
+	public:
+		ImageViewer(image_t&, std::string tt);
+		virtual ~ImageViewer();
+
+		/* do some init stuff */
+		virtual void init() = 0;
+		/* open window and show image */
+		virtual void show() = 0;
+		/* refresh window */
+		virtual void update() = 0;
+
+		virtual void resize(u32 w, u32 h) = 0;
+		virtual void best_size() = 0;
+		virtual void origin_size() = 0;
+	};
 	class image_io
 	{
 	public:
 		static image_t read(const char* path);
-		static void write_image(const image_t&, const char* path, u32 fmt = IMAGE_FMT_PNG);
+		static void write(image_t&, const char* path, u32 fmt = IMAGE_FMT_PNG);
+		static size2di screen_size();
+		static ImageViewer* show_image(image_t&, std::string title = "ImageView");
 	};
 }

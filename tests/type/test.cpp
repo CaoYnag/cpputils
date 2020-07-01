@@ -7,10 +7,10 @@ using namespace spes;
 
 BOOST_AUTO_TEST_CASE(EnvTest)
 {
-	BOOST_REQUIRE_EQUAL(sizeof(i8), 1);
-	BOOST_REQUIRE_EQUAL(sizeof(i16), 2);
-	BOOST_REQUIRE_EQUAL(sizeof(i32), 4);
-	BOOST_REQUIRE_EQUAL(sizeof(i64), 8);
+	BOOST_REQUIRE_EQUAL(sizeof(s8), 1);
+	BOOST_REQUIRE_EQUAL(sizeof(s16), 2);
+	BOOST_REQUIRE_EQUAL(sizeof(s32), 4);
+	BOOST_REQUIRE_EQUAL(sizeof(s64), 8);
 
 	BOOST_REQUIRE_EQUAL(sizeof(u8), 1);
 	BOOST_REQUIRE_EQUAL(sizeof(u16), 2);
