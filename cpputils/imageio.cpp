@@ -18,7 +18,7 @@ namespace spes::image::io
 {
 	ImageViewer::ImageViewer(image_t& im, std::string tt) : _im(im), _tt(tt)
 	{
-		_sz = rect_adjust(image_io::screen_size(), { (s32)im.width(), (s32)im.height() });
+		_sz = rect_adjust(image_io::screen_size(), { (f32)im.width(), (f32)im.height() });
 	}
 	ImageViewer::~ImageViewer()
 	{}
@@ -63,7 +63,7 @@ namespace spes::image::io
 			RegisterClass(&wc);
 
 			_hwnd = CreateWindowExA(WS_EX_OVERLAPPEDWINDOW, CLS_NAME, _tt.c_str(), WS_CAPTION | WS_SYSMENU | WS_SIZEBOX, CW_USEDEFAULT,
-				CW_USEDEFAULT, _sz.w, _sz.h, NULL, NULL, NULL, NULL);
+				CW_USEDEFAULT, (u32)_sz.w, (u32)_sz.h, NULL, NULL, NULL, NULL);
 			//_hwnd = CreateWindowExA(WS_EX_TOOLWINDOW, CLS_NAME, _tt.c_str(), WS_POPUP | WS_CAPTION, CW_USEDEFAULT,
 			//	CW_USEDEFAULT, _sz.w, _sz.h, NULL, NULL, NULL, NULL);
 			if (_hwnd == NULL)return;
@@ -245,12 +245,12 @@ namespace spes::image::io
 		write_png(im, path);
 	}
 
-	size2di image_io::screen_size()
+	size2d image_io::screen_size()
 	{
 #ifdef WIN32
 		RECT rect;
 		SystemParametersInfo(SPI_GETWORKAREA, 0, (void*)&rect, 0);
-		return { rect.right - rect.left, rect.bottom - rect.top - GetSystemMetrics(SM_CYCAPTION) };
+		return { rect.right - rect.left + .0f, rect.bottom - rect.top - GetSystemMetrics(SM_CYCAPTION) + .0f };
 #endif
 #ifdef UNIX
 #endif

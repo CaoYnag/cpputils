@@ -7,7 +7,7 @@ using namespace spes::image;
 
 namespace spes::canvas
 {
-	Canvas::Canvas(u32 w, u32 h, color_t bk) : _im(), _size(w * h)
+	Canvas::Canvas(u32 w, u32 h, color_t bk) : _im(), _sz({ w + .0f, h + .0f }), _size(w* h), _rc(0, 0, w, h)
 	{
 		_im.init(w, h);
 		_buff = _im.buffer();
@@ -19,7 +19,7 @@ namespace spes::canvas
 		_buff = nullptr;
 	}
 
-	void Canvas::draw(u32 mode, const std::vector<point2di>& pts, color_t c)
+	void Canvas::draw(u32 mode, const std::vector<point2d>& pts, color_t c)
 	{
 		switch (mode)
 		{
@@ -33,32 +33,36 @@ namespace spes::canvas
 		{
 			for (u32 i = 0; i < pts.size() - 1; i += 2)
 			{
-				draw_line(line2di(pts[i], pts[i + 1]), c);
+				draw_line(line2d(pts[i], pts[i + 1]), c);
 			}
 		}break;
 		case CRM_LineStrip:
 		{
 			for (u32 i = 0; i < pts.size() - 1; i += 1)
 			{
-				draw_line(line2di(pts[i], pts[i + 1]), c);
+				draw_line(line2d(pts[i], pts[i + 1]), c);
 			}
 		}break;
 		case CRM_LineRing:
 		{
 			for (u32 i = 0; i < pts.size() - 1; i += 1)
 			{
-				draw_line(line2di(pts[i], pts[i + 1]), c);
+				draw_line(line2d(pts[i], pts[i + 1]), c);
 			}
-			draw_line(line2di(pts[0], pts[pts.size() - 1]), c);
+			draw_line(line2d(pts[0], pts[pts.size() - 1]), c);
 		}break;
 		}
 	}
-	void  Canvas::draw_point(const point2di& p, color_t c)
+	void Canvas::draw_point(const point2d& p, color_t c)
 	{
 		_buff[idx(p)] = c;
 	}
-	void  Canvas::draw_line(const line2di& l, color_t c)
+	void Canvas::draw_line(const line2d& line, color_t c)
 	{
+		line2d l = line;
+		auto ret = cohen_sutherland(l, _rc);
+		if (ret == CR_REFUSED) return;
+
 		if (l.vertical())
 		{
 			s32 x = l._a.x;
@@ -116,4 +120,27 @@ namespace spes::canvas
 			_buff[idx(l._b.x, l._b.y)] = c;
 		}
 	}
+
+
+	void Canvas::draw_rect(const rect& rec, color_t c)
+	{
+		rect rc(0, 0, 0, 0);
+		if (intersects(_rc, rec, rc))
+		{
+			color_t* l = _buff + (s32)(rc.top() * _sz.w);
+
+			// may be memset would be better?
+			for (u32 y = rc.top(); y < rc.bottom(); ++y)
+			{
+				for (u32 x = rc.left(); x < rc.right(); ++x)
+					l[x] = c;
+				l += (s32)_sz.w;
+			}
+			
+		}
+	}
+	void Canvas::draw_triangle(const std::vector<point2d>& tri, color_t c)
+	{}
+	void Canvas::draw_polygon(const polygon2d& poly, color_t c)
+	{}
 }

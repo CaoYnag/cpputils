@@ -32,18 +32,22 @@ namespace spes::canvas
 		image_t _im;
 		u64 _size;
 		color_t* _buff;
+		rect _rc;
+		size2d _sz;
 
 		inline u32 idx(u32 x, u32 y) const { return x + y * _im.width(); }
-		inline u32 idx(const point2di& p) const { return p.x + p.y * _im.width(); }
+		inline u32 idx(const point2d& p) const { return p.x + p.y * _im.width(); }
 	public:
 		Canvas(u32 w, u32 h, color_t bk = Colors::WHITE);
 		virtual ~Canvas();
 
 		inline image_t& image() { return _im; }
 	public:
-		virtual void draw(u32 mode, const std::vector<point2di>& pts, color_t c = Colors::BLACK);
-		virtual void draw_point(const point2di& p, color_t c = Colors::BLACK);
-		virtual void draw_line(const line2di& l, color_t c = Colors::BLACK);
-		virtual void draw_polygon(const polygon2di& poly);
+		virtual void draw(u32 mode, const std::vector<point2d>& pts, color_t c = Colors::BLACK);
+		virtual void draw_point(const point2d& p, color_t c = Colors::BLACK);
+		virtual void draw_line(const line2d& l, color_t c = Colors::BLACK);
+		virtual void draw_rect(const rect& rec, color_t c = Colors::BLACK);
+		virtual void draw_triangle(const std::vector<point2d>& tri, color_t c = Colors::BLACK);
+		virtual void draw_polygon(const polygon2d& poly, color_t c = Colors::BLACK);
 	};
 }

@@ -15,16 +15,16 @@ namespace spes::canvas
 	class FuncCanvas : public Canvas
 	{
 	public:
-		FuncCanvas(size2di&, range2f&);
-		FuncCanvas(size2di&, size2di&, range2f&);
+		FuncCanvas(size2d&, range2d&);
+		FuncCanvas(size2d&, size2d&, range2d&);
 		virtual ~FuncCanvas();
-
+		
 		void background(color_t);
 		void background(image_t&);
 		void axis(bool draw, color_t c = Colors::BLACK);
 		void color(color_t);
-		void x_range(range2f&);
-		void y_range(range2f&);
+		void x_range(range2d&);
+		void y_range(range2d&);
 		void func(func);
 	};
 }

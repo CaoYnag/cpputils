@@ -19,7 +19,7 @@ namespace spes::image::io
 	{
 	protected:
 		image_t& _im;
-		size2di _sz;
+		size2d _sz;
 		std::string _tt;
 	public:
 		ImageViewer(image_t&, std::string tt);
@@ -41,7 +41,7 @@ namespace spes::image::io
 	public:
 		static image_t read(const char* path);
 		static void write(image_t&, const char* path, u32 fmt = IMAGE_FMT_PNG);
-		static size2di screen_size();
+		static size2d screen_size();
 		static ImageViewer* show_image(image_t&, std::string title = "ImageView");
 	};
 }
