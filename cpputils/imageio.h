@@ -10,10 +10,15 @@ namespace spes::image::io
 {
 	enum image_format
 	{
+		IMAGE_FMT_UNKNOWN,
 		IMAGE_FMT_BMP,
 		IMAGE_FMT_JPG,
-		IMAGE_FMT_PNG
+		IMAGE_FMT_JPEG,
+		IMAGE_FMT_PNG,
+		IMAGE_FMT_GIF
 	};
+
+	u32 image_format(const char* path);
 
 	class ImageViewer
 	{
@@ -41,6 +46,8 @@ namespace spes::image::io
 	public:
 		static image_t read(const char* path);
 		static void write(image_t&, const char* path, u32 fmt = IMAGE_FMT_PNG);
+		static std::vector<image_t> read_anim(const char* path);
+		static void write_anim(std::vector<image_t>&, const char* path, u32 delay, u32 fmt = IMAGE_FMT_GIF);
 		static size2d screen_size();
 		static ImageViewer* show_image(image_t&, std::string title = "ImageView");
 	};

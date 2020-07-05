@@ -5,6 +5,10 @@ using namespace std;
 
 namespace spes::image::io
 {
+	bool png_sig_check(s8* buff, u32 len)
+	{
+		return !png_sig_cmp((png_const_bytep)buff, 0, len);
+	}
 	image_t read_png(const char* file)
 	{
 		image_t im;

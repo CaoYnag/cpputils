@@ -1,9 +1,12 @@
 #include "imageio.h"
 #include "io_png.h"
+#include "io_jpeg.h"
+#include "io_gif.h"
 #include "math.h"
 #include <functional>
 #include <thread>
 #include <map>
+#include <fstream>
 #ifdef WIN32
 #include <Windows.h>
 #include <gl/glew.h>
@@ -235,16 +238,6 @@ namespace spes::image::io
 	}
 #endif
 
-	image_t image_io::read(const char* path)
-	{
-		return read_png(path);
-	}
-
-	void image_io::write(image_t& im, const char* path, u32 fmt)
-	{
-		write_png(im, path);
-	}
-
 	size2d image_io::screen_size()
 	{
 #ifdef WIN32
@@ -272,5 +265,62 @@ namespace spes::image::io
 		});
 		th.detach();
 		return viewer;
+	}
+
+
+
+	u32 image_format(const char* path)
+	{
+		constexpr u32 BYTES_TO_CHECK = 4;
+		char buff[BYTES_TO_CHECK + 1];
+		ifstream in(path);
+		if (!in) return IMAGE_FMT_UNKNOWN;
+		in >> buff;
+		in.close();
+
+		if (png_sig_check(buff, BYTES_TO_CHECK))
+			return IMAGE_FMT_PNG;
+		if (jpeg_sig_check(buff, BYTES_TO_CHECK))
+			return IMAGE_FMT_JPEG;
+
+		return IMAGE_FMT_UNKNOWN;
+	}
+
+	image_t image_io::read(const char* path)
+	{
+		switch (image_format(path))
+		{
+		case IMAGE_FMT_JPG:
+		case IMAGE_FMT_JPEG:
+			return read_jpeg(path);
+		case IMAGE_FMT_PNG:
+			return read_png(path);
+		case IMAGE_FMT_BMP:
+		default: break;
+		}
+		return image_t();
+	}
+
+	void image_io::write(image_t& im, const char* path, u32 fmt)
+	{
+		switch (fmt)
+		{
+		case IMAGE_FMT_PNG:
+			write_png(im, path); break;
+		case IMAGE_FMT_JPG:
+		case IMAGE_FMT_JPEG:
+			write_jpeg(im, path); break;
+		default:
+			break;
+		}
+	}
+
+	std::vector<image_t> read_anim(const char* path)
+	{
+		return {};
+	}
+	void write_anim(std::vector<image_t>& ims, const char* path, u32 delay, u32 fmt)
+	{
+		write_gif(ims, path, delay);
 	}
 }

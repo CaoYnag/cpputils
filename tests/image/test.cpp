@@ -12,8 +12,10 @@ using namespace spes::image::io;
 int main(int argc, char* argv)
 {
 #ifdef WIN32
-	const char* path = "D:\\temp\\img_pro\\interlude_01.png";
-	const char* write_path = "D:\\temp\\img_pro\\write_test.png";
+	const char* png_path = "D:\\temp\\img_pro\\interlude_01.png";
+	const char* png_write_path = "D:\\temp\\img_pro\\png_write_test.png";
+	const char* jpeg_path = "D:\\temp\\img_pro\\ac_morty.jpg";
+	const char* jpeg_write_path = "D:\\temp\\img_pro\\jpeg_write_test.png";
 #endif
 #ifdef UNIX
 	const char* path = "";
@@ -32,12 +34,32 @@ int main(int argc, char* argv)
 	image_io::write(mem, write_path);*/
 
 
-	cout << "Reading file " << path << endl;
-	auto im = image_io::read(path);
-	cout << "img size (" << im.width() << " * " << im.height() << ")" << endl;
-	image_io::show_image(im);
-	image_io::write(im, write_path);
+	/*cout << "Reading png file " << png_path << endl;
+	auto im = image_io::read(png_path);
+	if (!im)
+	{
+		cout << "err read im " << png_path << endl;
+	}
+	else
+	{
+		cout << "img size (" << im.width() << " * " << im.height() << ")" << endl;
+		image_io::show_image(im, "PNG Image");
+		image_io::write(im, png_write_path);
+	}*/
 
+	cout << "Reading jpeg file " << jpeg_path << endl;
+	auto jim = image_io::read(jpeg_path);
+	if (!jim)
+	{
+		cout << "err read im " << jpeg_path << endl;
+	}
+	else
+	{
+		cout << "img size (" << jim.width() << " * " << jim.height() << ")" << endl;
+		image_io::show_image(jim, "Jpeg Image");
+		image_io::write(jim, jpeg_write_path, IMAGE_FMT_JPEG);
+	}
+	
 	/*buff = im.buffer();
 	for (int i = 0; i < im.width() * im.height(); ++i)
 	{

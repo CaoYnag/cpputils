@@ -4,6 +4,23 @@ using namespace spes::color;
 
 namespace spes::image
 {
+	enum IMAGE_PIXEL_FORMAT
+	{
+		IMP_FMT_ARGB,
+		IMP_FMT_XRGB,
+		IMP_FMT_RGB,
+		IMP_FMT_GREY
+	};
+	s32 format_depth(u32 fmt);
+	struct im_buff
+	{
+		u8* buff;
+		u32 w, h, fmt;
+		im_buff(u32 w, u32 h, u32 fmt);
+		im_buff(u32 w, u32 h, u32 fmt, u8* data);
+		virtual ~im_buff();
+	};
+
 	class image_t
 	{
 	protected:
@@ -43,4 +60,8 @@ namespace spes::image
 			return _init;
 		}
 	};
+	bool operator!(const image_t&);
+
+	image_t image_transform(const im_buff&);
+	im_buff image_transform(image_t&, u32 fmt);
 }
