@@ -251,7 +251,7 @@ namespace spes::image::io
 
 	ImageViewer* image_io::show_image(image_t& im, string title)
 	{
-		WindowsImageViewer* viewer;
+		ImageViewer* viewer;
 #ifdef WIN32
 		viewer = new WindowsImageViewer(im, title);
 #endif

@@ -17,8 +17,11 @@ int main(int argc, char* argv)
 	const char* jpeg_path = "D:\\temp\\img_pro\\ac_morty.jpg";
 	const char* jpeg_write_path = "D:\\temp\\img_pro\\jpeg_write_test.png";
 #endif
-#ifdef UNIX
-	const char* path = "";
+#ifdef unix
+	const char* png_path = "/home/spes/Pictures/Wallpaper/13517568-2edda26680447bb2.png";
+	const char* png_write_path = "/home/spes/temp/png_write_test.png";
+	const char* jpeg_path = "/home/spes/Pictures/Wallpaper/sakura.jpg";
+	const char* jpeg_write_path = "/home/spes/temp/jpeg_write_test.png";
 #endif
 
 	/*image_t mem;

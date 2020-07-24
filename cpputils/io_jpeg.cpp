@@ -11,7 +11,8 @@ namespace spes::image::io
 	bool jpeg_sig_check(s8* buff, u32 l)
 	{
 		constexpr u32 JPEG_SIG_LEN = 4;
-		constexpr s8 JPEG_SIG[] = {0xff, 0xd8, 0xff, 0xe0};
+		// TODO: any other choice to init a char array?
+		constexpr s8 JPEG_SIG[] = {(s8)0xff, (s8)0xd8, (s8)0xff, (s8)0xe0};
 		u32 len = l < JPEG_SIG_LEN ? l : JPEG_SIG_LEN;
 		for (int i = 0; i < 4; ++i)
 			if (buff[i] != JPEG_SIG[i]) return false;
