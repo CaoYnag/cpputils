@@ -14,7 +14,7 @@ namespace spes::canvas
 		for (u64 i = 0; i < _size; ++i)
 			_buff[i] = bk;
 	}
-	Canvas::Canvas(image_t& im) : _im(im), _sz({ im.width(), im.height() }), 
+	Canvas::Canvas(image_t& im) : _im(im), _sz({ im.width() + .0f, im.height() + .0f }), 
 		_size(im.width() * im.height()), _rc(0, 0, im.width(), im.height())
 	{
 		_buff = _im.buffer();
@@ -104,16 +104,16 @@ namespace spes::canvas
 		}
 		else
 		{
-			s32 x = l._a.x;
+			f32 x = l._a.x;
 			f32 y = l._a.y;
-			s32 inc = l._a.x > l._b.x ? -1 : 1;
-			s32 yinc = l._k * inc;
-			s32 yinci = yinc > 0 ? 1 : -1;
-			while(x < l._b.x)
+			f32 inc = l._a.x > l._b.x ? -1 : 1;
+			f32 yinc = l._k * inc;
+			f32 yinci = yinc > 0 ? 1 : -1;
+			while ((x - l._b.x) * inc < 0)
 			{
-				s32 nx = x + inc;
+				f32 nx = x + inc;
 				f32	ny = y + yinc;
-				while (y != ny)
+				while ((y - ny) * yinc < 0)
 				{
 					_buff[idx(x, y)] = c;
 					y += yinci;
@@ -141,11 +141,106 @@ namespace spes::canvas
 					l[x] = c;
 				l += (s32)_sz.w;
 			}
-			
 		}
 	}
 	void Canvas::draw_triangle(const std::vector<point2d>& tri, color_t c)
-	{}
+	{
+		if (tri.size() < 3) return; // not a triangle
+		if (tri[0].y == tri[2].y && tri[1].y == tri[2].y) return; // a vertical line
+		if (tri[0].x == tri[2].x && tri[1].x == tri[2].x) return; // a horizontal line
+		// situation 1 or 2
+		if (tri[0].y == tri[1].y || tri[0].y == tri[2].y || tri[1].y == tri[2].y)
+		{
+			point2d h1, h2, v;
+			if (tri[0].y == tri[1].y)
+			{
+				h1 = tri[0];
+				h2 = tri[1];
+				v = tri[2];
+			}
+			else if (tri[0].y == tri[2].y)
+			{
+				h1 = tri[0];
+				h2 = tri[2];
+				v = tri[1];
+			}
+			else
+			{
+				h1 = tri[1];
+				h2 = tri[2];
+				v = tri[0];
+			}
+
+			s32 inc = v.y > h1.y ? 1 : -1;
+			line2d l1(v, h1), l2(v, h2);
+			for (s32 y = h1.y; (y - v.y) * inc <= 0; y += inc)
+			{
+				f32 x1, x2;
+				l1.resolv_x(y, x1);
+				l2.resolv_x(y, x2);
+
+				draw_line(line2d({ x1, y + .0f }, { x2, y + .0f }), c);
+			}
+			return;
+		}
+
+		// situation 3
+		point2d top, mid, bot;
+		auto max_y = spes::math::fmax(spes::math::fmax(tri[0].y, tri[1].y), tri[2].y);
+		auto min_y = spes::math::fmin(spes::math::fmin(tri[0].y, tri[1].y), tri[2].y);
+		for (int i = 0; i < 3; ++i)
+		{
+			if (tri[i].y == max_y)
+				bot = tri[i];
+			else if (tri[i].y == min_y)
+				top = tri[i];
+			else mid = tri[i];
+		}
+		line2d s1(top, mid), s2(mid, bot), h(top, bot);
+		for (s32 y = top.y; y <= bot.y; ++y)
+		{
+			f32 x1, x2;
+			if (y >= mid.y)
+				s2.resolv_x(y, x1);
+			else s1.resolv_x(y, x1);
+			h.resolv_x(y, x2);
+
+			draw_line(line2d({ x1, y + .0f }, { x2, y + .0f }), c);
+		}
+	}
 	void Canvas::draw_polygon(const polygon2d& poly, color_t c)
-	{}
+	{
+		vector<point2d> tmp = poly._pts;
+		while (tmp.size() > 2)
+		{
+			int idx = 0;
+			for (; idx < tmp.size() - 2; ++idx)
+			{
+				auto pt1 = tmp[idx], pt2 = tmp[idx + 1], pt3 = tmp[idx + 2];
+				auto v1 = pt2 - pt1, v2 = pt3 - pt2;
+				auto r1 = cross(v1, v2);
+				if (r1 > 0)
+				{
+					draw_triangle({ pt1, pt2, pt3 }, c);
+					tmp.erase(tmp.begin() + idx + 1);
+
+					if (idx == 0)
+					{
+						pt1 = tmp[tmp.size() - 1], pt2 = tmp[idx], pt3 = tmp[idx + 1];
+						v1 = pt2 - pt1, v2 = pt3 - pt2;
+						r1 = cross(v1, v2);
+
+						if (r1 == 0)
+							tmp.erase(tmp.begin() + idx);
+					}
+					break;
+				}
+				if (r1 == 0)
+				{
+					tmp.erase(tmp.begin() + idx + 1);
+					break;
+				}
+			}
+		}
+	}
 }

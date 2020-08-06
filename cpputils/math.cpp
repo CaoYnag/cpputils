@@ -33,6 +33,12 @@ namespace spes::math
 		return v1.x == v2.x && v1.y == v2.y;
 	}
 
+
+	f32 cross(vector2d& v1, vector2d& v2)
+	{
+		return v1.x * v2.y - v1.y * v2.x;
+	}
+
 	size2d rect_adjust(size2d border, size2d rect)
 	{
 		if (rect.w > border.w)
@@ -69,6 +75,24 @@ namespace spes::math
 	{
 		_b = p;
 		gen_k();
+	}
+
+	bool line2d::resolv_x(f32 y, f32& x)
+	{
+		if (vertical())
+			x = _a.x;
+		else
+			x = _a.x + (y - _a.y) / _k;
+		return in_range(y, _a.y, _b.y) || in_range(y, _b.y, _a.y);
+	}
+
+	bool line2d::resolv_y(f32 x, f32& y)
+	{
+		if (horizontal())
+			y = _a.y;
+		else
+			y = (x - _a.x) * _k + _a.y;
+		return in_range(x, _a.x, _b.x) || in_range(x, _b.x, _a.x);
 	}
 
 	bool operator==(const line2d& v1, const line2d& v2)
@@ -251,4 +275,24 @@ namespace spes::math
 	}
 	void polygon2d::compute_nms(const std::vector<vector2d>& pts, std::vector<vector2d>& nms)
 	{}
+
+
+	polygon2d polygons::Hexagon(f32 sz)
+	{
+		return polygon2d({});
+	}
+	polygon2d polygons::Hexagram(f32 sz)
+	{
+		f32 sz_2 = sz / 2.f,
+			sz_3 = sz / 3.f,
+			sz_4 = sz / 4.f,
+			sz_6 = sz / 6.f;
+		return polygon2d(
+			{
+				{sz_2, .0f}, {sz_3 * 2, sz_4}, {sz, sz_4},
+				{sz - sz_6, sz_2}, {sz, sz_4 * 3}, {sz_3 * 2, sz_4 * 3},
+				{sz_2, sz}, {sz_3, sz_4 * 3}, {0.f, sz_4 * 3},
+				{sz_6, sz_2}, {0, sz_4}, {sz_3, sz_4}
+			});
+	}
 }

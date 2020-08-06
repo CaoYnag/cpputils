@@ -15,6 +15,11 @@ namespace spes::math
 		return a < b ? a : b;
 	}
 
+	inline bool in_range(f32 v, f32 s, f32 e, bool contains_border = true)
+	{
+		return (v > s&& v < e) || (contains_border && (v == s || v == e));
+	}
+
 	template<typename T>
 	double avg(const std::vector<T>& nums)
 	{
@@ -79,6 +84,7 @@ namespace spes::math
 	 s32 operator*(const vector2d& v1, const vector2d& v2);
 	 vector2d operator*(const vector2d& v, f32 s);
 	 bool operator==(const vector2d& v1, const vector2d& v2);
+	 f32 cross(vector2d& v1, vector2d& v2);
 
 	/*
 	scale rect, makes it can be included in border
@@ -100,6 +106,9 @@ namespace spes::math
 		inline bool horizontal() const { return _a.y == _b.y; }
 		void a(const vector2d& p);
 		void b(const vector2d& p);
+
+		bool resolv_x(f32 y, f32& x);
+		bool resolv_y(f32 x, f32& y);
 	};
 
 	bool operator==(const line2d& v1, const line2d& v2);
@@ -166,5 +175,12 @@ namespace spes::math
 	public:
 		static bool judge_convex(const std::vector<vector2d>& pts);
 		static void compute_nms(const std::vector<vector2d>& pts, std::vector<vector2d>& nms);
+	};
+
+	class polygons
+	{
+	public:
+		static polygon2d Hexagon(f32 sz);
+		static polygon2d Hexagram(f32 sz);
 	};
 }
