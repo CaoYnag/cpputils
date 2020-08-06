@@ -267,6 +267,8 @@ namespace spes::math
 		_convex = judge_convex(pts);
 		compute_nms(pts, _nms);
 	}
+	polygon2d::polygon2d(const polygon2d& poly) : _pts(poly._pts), _num(poly._num), _convex(poly._convex), _nms(poly._nms)
+	{}
 	polygon2d::~polygon2d() {}
 
 	bool polygon2d::judge_convex(const std::vector<vector2d>& pts)

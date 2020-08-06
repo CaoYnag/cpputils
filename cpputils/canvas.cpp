@@ -7,7 +7,7 @@ using namespace spes::image;
 
 namespace spes::canvas
 {
-	Canvas::Canvas(u32 w, u32 h, color_t bk) : _im(), _sz({ w + .0f, h + .0f }), _size(w* h), _rc(0, 0, w, h)
+	Canvas::Canvas(u32 w, u32 h, color_t bk) : _im(), _sz({ w + .0f, h + .0f }), _size(w* h), _rc(0, 0, w - 1, h - 1)
 	{
 		_im.init(w, h);
 		_buff = _im.buffer();
@@ -15,7 +15,7 @@ namespace spes::canvas
 			_buff[i] = bk;
 	}
 	Canvas::Canvas(image_t& im) : _im(im), _sz({ im.width() + .0f, im.height() + .0f }), 
-		_size(im.width() * im.height()), _rc(0, 0, im.width(), im.height())
+		_size(im.width() * im.height()), _rc(0, 0, im.width() - 1, im.height() - 1)
 	{
 		_buff = _im.buffer();
 	}

@@ -166,6 +166,7 @@ namespace spes::math
 		bool _convex;
 	public:
 		polygon2d(const std::vector<vector2d>& pts);
+		polygon2d(const polygon2d&);
 		virtual ~polygon2d();
 
 		inline u32 num() const { return _num; }
