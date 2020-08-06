@@ -30,6 +30,7 @@ namespace spes::image::io
 		(*cinfo->err->output_message) (cinfo);
 		longjmp(myerr->env, 1);
 	}
+	
 	image_t read_jpeg(const char* path)
 	{
 		jpeg_decompress_struct cinfo;

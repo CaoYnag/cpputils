@@ -39,6 +39,7 @@ namespace spes::canvas
 		inline u32 idx(const point2d& p) const { return p.x + p.y * _im.width(); }
 	public:
 		Canvas(u32 w, u32 h, color_t bk = Colors::WHITE);
+		Canvas(image_t& im);
 		virtual ~Canvas();
 
 		inline image_t& image() { return _im; }

@@ -14,6 +14,11 @@ namespace spes::canvas
 		for (u64 i = 0; i < _size; ++i)
 			_buff[i] = bk;
 	}
+	Canvas::Canvas(image_t& im) : _im(im), _sz({ im.width(), im.height() }), 
+		_size(im.width() * im.height()), _rc(0, 0, im.width(), im.height())
+	{
+		_buff = _im.buffer();
+	}
 	Canvas::~Canvas()
 	{
 		_buff = nullptr;

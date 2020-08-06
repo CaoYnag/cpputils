@@ -9,7 +9,7 @@ using namespace spes;
 using namespace spes::image;
 using namespace spes::image::io;
 
-int main(int argc, char* argv)
+int main(int argc, char* argv[])
 {
 #ifdef WIN32
 	const char* png_path = "D:\\temp\\img_pro\\interlude_01.png";
@@ -17,7 +17,7 @@ int main(int argc, char* argv)
 	const char* jpeg_path = "D:\\temp\\img_pro\\ac_morty.jpg";
 	const char* jpeg_write_path = "D:\\temp\\img_pro\\jpeg_write_test.png";
 #endif
-#ifdef unix
+#ifdef __unix__
 	const char* png_path = "/home/spes/Pictures/Wallpaper/13517568-2edda26680447bb2.png";
 	const char* png_write_path = "/home/spes/temp/png_write_test.png";
 	const char* jpeg_path = "/home/spes/Pictures/Wallpaper/sakura.jpg";

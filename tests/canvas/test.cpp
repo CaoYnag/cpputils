@@ -15,6 +15,12 @@ using namespace spes::canvas;
 
 int main(int argc, char* argv)
 {
+	const char* write_path = nullptr;
+	const char* write_path2 = nullptr;
+#ifdef __unix__
+	write_path = "/home/spes/temp/canvas1.png";
+	write_path2 = "/home/spes/temp/canvas2.png";
+#endif
 	const u32 SIZE = 700;
 	Canvas canvas(SIZE, SIZE);
 	Canvas canvas2(SIZE,  SIZE);
@@ -104,5 +110,7 @@ int main(int argc, char* argv)
 
 	canvas2.draw_rect(rect(-10, -10, 300, 300), Colors::AQUA);
 	getch();
+	image_io::write(canvas.image(), write_path);
+	image_io::write(canvas2.image(), write_path2);
 	return 0;
 }

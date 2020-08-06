@@ -6,10 +6,15 @@
 #include <functional>
 #include <thread>
 #include <map>
-#include <fstream>
 #ifdef WIN32
 #include <Windows.h>
 #include <gl/glew.h>
+#endif
+#ifdef __unix__
+#include <xcb/xcb.h>	// screen size
+#include <GL/gl.h>
+#include <GL/glu.h>
+#include <GL/glut.h>
 #endif
 using namespace std;
 using namespace spes;
@@ -237,6 +242,41 @@ namespace spes::image::io
 		return DefWindowProc(hWnd, uMsg, wParam, lParam);
 	}
 #endif
+#ifdef __unix__
+	class UnixImageViewer : public ImageViewer
+	{
+	public:
+		static map<int, UnixImageViewer*> INSTS;
+	protected:
+		int _wnd;
+		u32 _tex;
+	public:
+		UnixImageViewer(image_t& im, string tt) : ImageViewer(im, tt)
+		{}
+		virtual ~UnixImageViewer()
+		{
+			INSTS[_wnd] = nullptr;
+		}
+
+		/* do some init stuff */
+		virtual void init()
+		{
+			
+		}
+		/* open window and show image */
+		virtual void show()
+		{
+			
+		}
+		/* refresh window */
+		virtual void update(){}
+
+		virtual void resize(u32 w, u32 h){}
+		virtual void best_size(){}
+		virtual void origin_size(){}
+	};
+	map<int, UnixImageViewer*> UnixImageViewer::INSTS;
+#endif
 
 	size2d image_io::screen_size()
 	{
@@ -245,18 +285,30 @@ namespace spes::image::io
 		SystemParametersInfo(SPI_GETWORKAREA, 0, (void*)&rect, 0);
 		return { rect.right - rect.left + .0f, rect.bottom - rect.top - GetSystemMetrics(SM_CYCAPTION) + .0f };
 #endif
-#ifdef UNIX
+#ifdef __unix__
+		/* Open the connection to the X server. Use the DISPLAY environment variable */
+		int i, screenNum;
+		xcb_connection_t *connection = xcb_connect (NULL, &screenNum);
+		/* Get the screen whose number is screenNum */ 
+		const xcb_setup_t *setup = xcb_get_setup (connection);
+		xcb_screen_iterator_t iter = xcb_setup_roots_iterator (setup);  
+		// we want the screen at index screenNum of the iterator
+		for (i = 0; i < screenNum; ++i) 
+			xcb_screen_next (&iter);
+
+		xcb_screen_t *screen = iter.data;
+		return {screen->width_in_pixels, screen->height_in_pixels};
 #endif
 	}
 
 	ImageViewer* image_io::show_image(image_t& im, string title)
 	{
-		ImageViewer* viewer;
+		ImageViewer* viewer = nullptr;
 #ifdef WIN32
 		viewer = new WindowsImageViewer(im, title);
 #endif
-#ifdef UNIX
-
+#ifdef __unix__
+		viewer = new UnixImageViewer(im, title);
 #endif
 		thread th([=]()->void
 		{
@@ -267,17 +319,15 @@ namespace spes::image::io
 		return viewer;
 	}
 
-
-
 	u32 image_format(const char* path)
 	{
 		constexpr u32 BYTES_TO_CHECK = 4;
-		char buff[BYTES_TO_CHECK + 1];
-		ifstream in(path);
-		if (!in) return IMAGE_FMT_UNKNOWN;
-		in >> buff;
-		in.close();
-
+		constexpr u32 BYTES_TO_READ = BYTES_TO_CHECK + 1;
+		char buff[BYTES_TO_READ];
+		FILE* fp = fopen(path, "r");
+		if (!fp) return IMAGE_FMT_UNKNOWN;
+		fgets(buff, BYTES_TO_READ, fp);
+		fclose(fp);
 		if (png_sig_check(buff, BYTES_TO_CHECK))
 			return IMAGE_FMT_PNG;
 		if (jpeg_sig_check(buff, BYTES_TO_CHECK))
