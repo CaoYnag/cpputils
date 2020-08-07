@@ -20,7 +20,7 @@ f32 cross(vector2d& v1, vector2d& v2)
 	return v1.x * v2.y - v1.y * v2.x;
 }
 
-int main(int argc, char* argv)
+int main(int argc, char** argv)
 {
 	const u32 SIZE = 700;
 	Canvas canvas(SIZE, SIZE);
@@ -184,7 +184,7 @@ int main(int argc, char* argv)
 	{
 		{100.f, 100.f}, {350.f, 600.f}, {600.f, 100.f}, {350.f, 300.f}
 	};*/
-	canvas.draw(CRM_LineRing, { {.0f, .0f}, {699.f, 0.f}, {699.f, 699.f}, {0.f, 699.f} }, Colors::RED);
+	canvas.draw(CRM_LineRing, { {.0f, .0f}, {699.f, 0.f}, {699.f, 699.f}, {0.f, 699.f} }, Colors::AQUA);
 	canvas.draw(CRM_LineRing, pts);
 	getch();
 
