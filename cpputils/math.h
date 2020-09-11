@@ -170,7 +170,7 @@ namespace spes::math
 		virtual ~polygon2d();
 
 		inline u32 num() const { return _num; }
-		inline rect bbox() const {}
+		inline rect bbox() const { return rect(0, 0, 0, 0);} // TODO: complete this
 		inline bool is_convex() const { return _convex; }
 		inline bool is_concave() const { return !_convex; }
 	public:

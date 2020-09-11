@@ -19,14 +19,14 @@ namespace spes::image
 			return 0;
 		}
 	}
-	im_buff::im_buff(u32 ww, u32 hh, u32 ffmt) : w(ww), h(hh), fmt(ffmt)
+	im_buff::im_buff(s32 ww, s32 hh, u32 ffmt) : w(ww), h(hh), fmt(ffmt)
 	{
 		u32 sz = w * h;
 		s32 dep = format_depth(fmt);
 		buff = new u8[sz * dep];
 		memset(buff, 0, sz * dep);
 	}
-	im_buff::im_buff(u32 ww, u32 hh, u32 ffmt, u8* data) : w(ww), h(hh), fmt(ffmt)
+	im_buff::im_buff(s32 ww, s32 hh, u32 ffmt, u8* data) : w(ww), h(hh), fmt(ffmt)
 	{
 		u32 sz = w * h;
 		s32 dep = format_depth(fmt);
@@ -46,11 +46,11 @@ namespace spes::image
 	{
 		init(im);
 	}
-	void image_t::init(u32 w, u32 h)
+	void image_t::init(s32 w, s32 h)
 	{
 		init(w, h, nullptr);
 	}
-	void image_t::init(u32 w, u32 h, color_t* buff)
+	void image_t::init(s32 w, s32 h, color_t* buff)
 	{
 		_w = w;
 		_h = h;
@@ -79,12 +79,35 @@ namespace spes::image
 		else
 			return 0;
 	}
-	void image_t::set_pixel(int x, int y, color_t c)
+	void image_t::set_pixel(s32 x, s32 y, color_t c)
 	{
 		if (_init)
 		_buff[idx(x, y)] = c;
 	}
 
+    void image_t::set_pixels(const image_t& im, s32 px, s32 py)
+    {
+	    if(px >= _w || py >= _h || px <= -im._w || py <= -im._h) return;
+	    int dy = py + im.height();
+
+	    int y = py;
+	    if(y < 0) y = 0;
+	    for(; y < dy; ++y)
+        {
+	        if(y >= _h) break;
+	        int x = px;
+	        if(x < 0) x = 0;
+
+	        int src_idx = (y - py) * im._w + (x - px);
+	        int dst_idx = y * _w + x;
+	        int cpy_w = im._w;
+	        if(px < 0)
+	            cpy_w += px;
+	        if(px + im._w > _w)
+	            cpy_w -= (px + im._w) - _w;
+            memcpy(_buff + dst_idx, im._buff + src_idx, cpy_w * 4);
+        }
+    }
 
 
 	image_t image_transform(const im_buff& buff)
