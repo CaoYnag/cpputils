@@ -12,9 +12,7 @@
 #endif
 #ifdef __unix__
 #include <xcb/xcb.h>	// screen size
-#include <GL/gl.h>
-#include <GL/glu.h>
-#include <GL/glut.h>
+#include <gtk/gtk.h>
 #endif
 using namespace std;
 using namespace spes;
@@ -24,7 +22,7 @@ using namespace spes::image;
 
 namespace spes::image::io
 {
-	ImageViewer::ImageViewer(image_t& im, std::string tt) : _im(im), _tt(tt)
+	ImageViewer::ImageViewer(image_t im, std::string tt) : _im(move(im)), _tt(tt)
 	{
 		_sz = rect_adjust(image_io::screen_size(), { (f32)im.width(), (f32)im.height() });
 	}
@@ -246,27 +244,49 @@ namespace spes::image::io
 	class UnixImageViewer : public ImageViewer
 	{
 	public:
-		static map<int, UnixImageViewer*> INSTS;
+		static bool INITED;
 	protected:
-		int _wnd;
-		u32 _tex;
+        GtkWidget* _wnd;
+        GtkWidget* _img;
 	public:
 		UnixImageViewer(image_t& im, string tt) : ImageViewer(im, tt)
-		{}
+		{
+		}
 		virtual ~UnixImageViewer()
 		{
-			INSTS[_wnd] = nullptr;
 		}
 
 		/* do some init stuff */
 		virtual void init()
 		{
-			
+            if(INITED) return;
+            g_thread_init(0);
+            gdk_threads_init();
+            gtk_init(0, 0);
+            INITED = true;
 		}
 		/* open window and show image */
 		virtual void show()
 		{
-			
+            gdk_threads_enter();
+            _wnd = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+            gtk_window_set_position(GTK_WINDOW(_wnd), GTK_WIN_POS_CENTER);
+            gtk_window_set_default_size(GTK_WINDOW(_wnd), 100, 100);
+            gtk_window_set_title(GTK_WINDOW(_wnd), _tt.c_str());
+            gtk_window_set_resizable(GTK_WINDOW(_wnd), FALSE);
+
+            gtk_container_set_border_width(GTK_CONTAINER(_wnd), 2);
+
+            auto pix = gdk_pixbuf_new_from_data((const guchar*)_im.buffer(), GDK_COLORSPACE_RGB, true, 8, _im.width(), _im.height(), _im.width() * 4, NULL, NULL);
+            _img = gtk_image_new_from_pixbuf(pix);
+            gtk_container_add(GTK_CONTAINER(_wnd), _img);
+
+
+            g_signal_connect_swapped(G_OBJECT(_wnd), "destroy",
+                                     G_CALLBACK(gtk_main_quit), G_OBJECT(_wnd));
+            gtk_widget_show_all(_wnd);
+            gtk_main();
+            gdk_threads_leave();
 		}
 		/* refresh window */
 		virtual void update(){}
@@ -275,7 +295,7 @@ namespace spes::image::io
 		virtual void best_size(){}
 		virtual void origin_size(){}
 	};
-	map<int, UnixImageViewer*> UnixImageViewer::INSTS;
+	bool UnixImageViewer::INITED = false;
 #endif
 
 	size2d image_io::screen_size()

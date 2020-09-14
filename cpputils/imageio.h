@@ -23,11 +23,11 @@ namespace spes::image::io
 	class ImageViewer
 	{
 	protected:
-		image_t& _im;
+		image_t _im;
 		size2d _sz;
 		std::string _tt;
 	public:
-		ImageViewer(image_t&, std::string tt);
+		ImageViewer(image_t, std::string tt);
 		virtual ~ImageViewer();
 
 		/* do some init stuff */
