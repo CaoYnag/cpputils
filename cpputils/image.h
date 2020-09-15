@@ -9,7 +9,8 @@ namespace spes::image
 		IMP_FMT_ARGB,
 		IMP_FMT_XRGB,
 		IMP_FMT_RGB,
-		IMP_FMT_GREY
+		IMP_FMT_GREY,
+		IMP_FMT_HSV
 	};
 	s32 format_depth(u32 fmt);
 	struct im_buff
@@ -18,6 +19,7 @@ namespace spes::image
         s32 w, h, fmt;
 		im_buff(s32 w, s32 h, u32 fmt);
 		im_buff(s32 w, s32 h, u32 fmt, u8* data);
+		im_buff(const im_buff& o);
 		virtual ~im_buff();
 	};
 

@@ -6,6 +6,7 @@
 #include <functional>
 #include <thread>
 #include <map>
+#include <mutex>
 #ifdef WIN32
 #include <Windows.h>
 #include <gl/glew.h>
@@ -42,7 +43,7 @@ namespace spes::image::io
 		HGLRC _rc;
 		u32 _tex;
 	public:
-		WindowsImageViewer(image_t& im, string tt) : ImageViewer(im, tt)
+		WindowsImageViewer(const image_t& im, string tt) : ImageViewer(im, tt)
 		{
 		}
 		virtual ~WindowsImageViewer()
@@ -245,11 +246,12 @@ namespace spes::image::io
 	{
 	public:
 		static bool INITED;
+		static mutex MUTEX;
 	protected:
         GtkWidget* _wnd;
         GtkWidget* _img;
 	public:
-		UnixImageViewer(image_t& im, string tt) : ImageViewer(im, tt)
+		UnixImageViewer(const image_t& im, string tt) : ImageViewer(im, tt)
 		{
 		}
 		virtual ~UnixImageViewer()
@@ -259,11 +261,15 @@ namespace spes::image::io
 		/* do some init stuff */
 		virtual void init()
 		{
-            if(INITED) return;
-            g_thread_init(0);
-            gdk_threads_init();
-            gtk_init(0, 0);
-            INITED = true;
+            MUTEX.lock();
+            if(!INITED)
+            {
+                g_thread_init(0);
+                gdk_threads_init();
+                gtk_init(0, 0);
+                INITED = true;
+            }
+            MUTEX.unlock();
 		}
 		/* open window and show image */
 		virtual void show()
@@ -296,6 +302,7 @@ namespace spes::image::io
 		virtual void origin_size(){}
 	};
 	bool UnixImageViewer::INITED = false;
+	mutex UnixImageViewer::MUTEX;
 #endif
 
 	size2d image_io::screen_size()
@@ -321,7 +328,7 @@ namespace spes::image::io
 #endif
 	}
 
-	ImageViewer* image_io::show_image(image_t& im, string title)
+	ImageViewer* image_io::show_image(const image_t& im, string title)
 	{
 		ImageViewer* viewer = nullptr;
 #ifdef WIN32

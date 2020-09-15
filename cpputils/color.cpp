@@ -34,7 +34,6 @@ namespace spes::color
 		return *this;
 	}
 
-
 	color_t operator+(const color_t& a, const color_t& b)
 	{
 		u8 aa = a.a > b.a ? a.a : b.a;
@@ -48,14 +47,21 @@ namespace spes::color
 		u8 bb = a.b > b.b ? a.b - b.b : 0;
 		return color_t(rr, gg, bb, aa);
 	}
-	color_t operator==(const color_t& a, const color_t& b)
+	bool operator==(const color_t& a, const color_t& b)
 	{
 		return a.c == b.c;
 	}
-	color_t operator!=(const color_t& a, const color_t& b)
+    bool operator!=(const color_t& a, const color_t& b)
 	{
 		return a.c != b.c;
 	}
+    std::ostream& operator<<(std::ostream& os, const color_t& c)
+    {
+	    char buff[1024];
+	    sprintf(buff, "%02x%02x%02x%02x", c.a, c.r, c.g, c.b);
+	    os << buff;
+	    return os;
+    }
 
 
 	color_t Colors::BLACK	= 0xff000000;
@@ -64,4 +70,94 @@ namespace spes::color
 	color_t Colors::GREEN	= 0xff00ff00;
 	color_t Colors::BLUE	= 0xffff0000;
 	color_t Colors::AQUA	= 0xffffff00;
+
+
+	/* HSV */
+    hsv_t to_hsv(const color_t& c)
+    {
+        f32 r = c.r / 255.f;
+        f32 g = c.g / 255.f;
+        f32 b = c.b / 255.f;
+        f32 i = fmin(r, fmin(g, b));
+        f32 a = fmax(r, fmax(g, b));
+        f32 diff = a - i;
+
+        f32 h, s, v;
+        /* assign v */
+        v = a;
+        /* assign s */
+        if(a == .0f) s = 0;
+        else s = diff / a;
+        /* assign h */
+        constexpr const f32 PI = 3.141592654589793;
+        constexpr const f32 deg60 = PI / 3;
+
+        if(i == a) h = 0;
+        else if(a == r) h = deg60 * ((g - b) / diff);
+        else if(a == g) h = deg60 * ((b - r) / diff + 2);
+        else h = deg60 * ((r - g) / diff + 4);
+        return {h, s, v};
+    }
+    color_t from_hsv(const hsv_t& c)
+    {
+        constexpr const f32 PI = 3.141592654589793;
+        constexpr const f32 deg60 = PI / 3;
+
+        float r, g, b;
+        if(c.s == .0f)
+        {
+            r = c.v;
+            g = c.v;
+            b = c.v;
+        }
+        else
+        {
+            f32 h = c.h / deg60;
+            int ih = h;
+            f32 f = h - ih;
+            f32 pa = c.v * (1 - c.s);
+            f32 pb = c.v * (1 - c.s * f);
+            f32 pc = c.v * (1 - c.s * (1 - f));
+            switch (ih)
+            {
+                case 0:
+                {
+                    r = c.v;
+                    g = pc;
+                    b = pa;
+                }break;
+                case 1:
+                {
+                    r = pb;
+                    g = c.v;
+                    b = pa;
+                }break;
+                case 2:
+                {
+                    r = pa;
+                    g = c.v;
+                    b = pc;
+                }break;
+                case 3:
+                {
+                    r = pa;
+                    g = pb;
+                    b = c.v;
+                }break;
+                case 4:
+                {
+                    r = pc;
+                    g = pa;
+                    b = c.v;
+                }break;
+                case 5:
+                {
+                    r = c.v;
+                    g = pa;
+                    b = pb;
+                }break;
+            }
+        }
+        return color_t(r * 0xff, g * 0xff, b * 0xff);
+    }
 }

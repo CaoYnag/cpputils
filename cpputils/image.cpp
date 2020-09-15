@@ -8,6 +8,8 @@ namespace spes::image
 	{
 		switch (fmt)
 		{
+        case IMP_FMT_HSV:
+            return 12; // sizeof(f32) * 3
 		case IMP_FMT_ARGB:
 		case IMP_FMT_XRGB:
 			return 4;
@@ -31,11 +33,21 @@ namespace spes::image
 		u32 sz = w * h;
 		s32 dep = format_depth(fmt);
 		buff = new u8[sz * dep];
-		if (buff)
+		if (data)
 			memcpy(buff, data, sz * dep);
 		else
 			memset(buff, 0, sz * dep);
 	}
+    im_buff::im_buff(const im_buff& o) : w(o.w), h(o.h), fmt(o.fmt)
+    {
+	    u32 sz = w * h;
+        s32 dep = format_depth(fmt);
+        buff = new u8[sz * dep];
+        if (o.buff)
+            memcpy(buff, o.buff, sz * dep);
+        else
+            memset(buff, 0, sz * dep);
+    }
 	im_buff::~im_buff()
 	{}
 
@@ -131,11 +143,18 @@ namespace spes::image
 			switch (buff.fmt)
 			{
 			case IMP_FMT_RGB:
-				c = color_t(src[idx * 3], src[idx * 3 + 1], src[idx * 3 + 2], 0xff);
-				break;
+            {
+                c = color_t(src[idx * 3], src[idx * 3 + 1], src[idx * 3 + 2], 0xff);
+            }break;
 			case IMP_FMT_GREY:
-				c = color_t(src[idx], src[idx], src[idx], 0xff);
-				break;
+            {
+                c = color_t(src[idx], src[idx], src[idx], 0xff);
+            }break;
+            case IMP_FMT_HSV:
+            {
+                hsv_t* fsrc = (hsv_t*)src;
+                c = from_hsv(fsrc[idx]);
+            }break;
 			default:break;
 			}
 			dst[idx] = c;
@@ -170,6 +189,11 @@ namespace spes::image
 				// assume src image is grey, so  r == g == b
 				dst[idx] = c.r;
 			}break;
+            case IMP_FMT_HSV:
+            {
+                hsv_t* ndst = (hsv_t*)dst;
+                ndst[idx] = to_hsv(c);
+            }break;
 			default: break;
 			}
 		}

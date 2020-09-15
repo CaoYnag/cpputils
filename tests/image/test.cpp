@@ -84,9 +84,28 @@ void test2()
     image_io::write(im, "/home/spes/temp/image_render.jpg", IMAGE_FMT_JPEG);
 }
 
+void test_hsv()
+{
+    printf("hsv size: %d\n", sizeof(hsv_t));
+    auto shit = image_io::read("/home/spes/Resource/res/yuutsu.jpg");// 165x177
+    color_t first = shit.buffer()[0];
+    auto hsv = to_hsv(first);
+    auto buff = image_transform(shit, IMP_FMT_HSV);
+    hsv_t* hsvbuff = (hsv_t*)buff.buff;
+    auto hsvfirst = hsvbuff[0];
+    auto c = from_hsv(hsvfirst);
+    printf("equals: %d, hsv first: (%.2f, %.2f, %.2f), to hsv(%.2f, %.2f, %.2f)\n",
+           (c == first), hsvfirst.h, hsvfirst.s, hsvfirst.v,
+           hsv.h, hsv.s, hsv.v);
+    cout << "origin c: " << first << " reved: " << c << endl;
+    auto rev = image_transform(buff);
+    image_io::write(rev, "/home/spes/temp/rev_hsv.jpg", IMAGE_FMT_JPEG);
+}
+
 int main(int argc, char* argv[])
 {
     //test1();
     test2();
+    test_hsv();
 	return 0;
 }
