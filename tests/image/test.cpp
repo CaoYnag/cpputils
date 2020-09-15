@@ -82,6 +82,13 @@ void test2()
     im.set_pixels(shit, 100, 100);
     im.set_pixels(shit, 500, 500);
     image_io::write(im, "/home/spes/temp/image_render.jpg", IMAGE_FMT_JPEG);
+
+    auto sub1 = shit.get_pixels(0, 0, 100, 100);
+    image_io::write(sub1, "/home/spes/temp/image_sub1.jpg", IMAGE_FMT_JPEG);
+    auto sub2 = shit.get_pixels(-50, -50, 100, 100);
+    image_io::write(sub2, "/home/spes/temp/image_sub2.jpg", IMAGE_FMT_JPEG);
+    auto sub3 = shit.get_pixels(0, 0, 300, 300);
+    image_io::write(sub3, "/home/spes/temp/image_sub3.jpg", IMAGE_FMT_JPEG);
 }
 
 void test_hsv()

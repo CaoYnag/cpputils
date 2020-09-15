@@ -1,6 +1,6 @@
 ﻿#include <iostream>
 #include "../../cpputils/canvas.h"
-#include "../../cpputils/imageio.h"
+#include "../../cpputils//imageio.h"
 #include "../../cpputils/math.h"
 #include <vector>
 #include <stdexcept>

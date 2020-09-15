@@ -62,19 +62,30 @@ namespace spes::image
 	{
 		init(w, h, nullptr);
 	}
-	void image_t::init(s32 w, s32 h, color_t* buff)
-	{
-		_w = w;
-		_h = h;
-		_size = w * h;
-		if (_buff) delete[] _buff;
-		_buff = new color_t[_size];
-		if (buff)
-			memcpy(_buff, buff, _size * BAND_NUM);
-		else
-			memset(_buff, 0, _size * BAND_NUM);
-		_init = true;
-	}
+    void image_t::init(s32 w, s32 h, color_t c)
+    {
+        _w = w;
+        _h = h;
+        _size = w * h;
+        if (_buff) delete[] _buff;
+        _buff = new color_t[_size];
+        for(int i = 0; i < _size; ++i)
+            _buff[i] = c;
+        _init = true;
+    }
+    void image_t::init(s32 w, s32 h, color_t* buff)
+    {
+        _w = w;
+        _h = h;
+        _size = w * h;
+        if (_buff) delete[] _buff;
+        _buff = new color_t[_size];
+        if (buff)
+            memcpy(_buff, buff, _size * BAND_NUM);
+        else
+            memset(_buff, 0, _size * BAND_NUM);
+        _init = true;
+    }
 	void image_t::init(const image_t& image)
 	{
 		init(image._w, image._h, image._buff);
@@ -121,6 +132,35 @@ namespace spes::image
         }
     }
 
+    image_t image_t::get_pixels(s32 x, s32 y, s32 w, s32 h, color_t c)
+    {
+        image_t dst;
+        dst.init(w, h, c);
+        s32 dx = 0, dy = 0;
+        s32 sx = x, sy = y, sw = w, sh = h;
+        if(sx < 0)
+        {
+            sw += sx;
+            dx -= sx;
+            sx = 0;
+        }
+        if(sy < 0)
+        {
+            sh += sy;
+            dy -= sy;
+            sy = 0;
+        }
+        if(sw > _w) sw = _w;
+        if(sh > _h)  sh = _h;
+
+        for(int yi = 0; yi < sh; ++ yi)
+        {
+            auto src_buf = _buff + _w * (yi + sy) + sx;
+            auto dst_buf = dst._buff + dst._w * (yi + dy) + dx;
+            memcpy(dst_buf, src_buf, sw * BAND_NUM);
+        }
+        return dst;
+    }
 
 	image_t image_transform(const im_buff& buff)
 	{

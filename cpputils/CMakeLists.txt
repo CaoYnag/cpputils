@@ -9,12 +9,12 @@ set(SRC
     ${PROJECT_SOURCE_DIR}/math.cpp
     ${PROJECT_SOURCE_DIR}/color.cpp
     ${PROJECT_SOURCE_DIR}/image.cpp
-    ${PROJECT_SOURCE_DIR}/io_png.cpp
-    ${PROJECT_SOURCE_DIR}/io_jpeg.cpp
-    ${PROJECT_SOURCE_DIR}/io_gif.cpp
-    ${PROJECT_SOURCE_DIR}/imageio.cpp
     ${PROJECT_SOURCE_DIR}/canvas.cpp
     ${PROJECT_SOURCE_DIR}/canvas_func.cpp
+	${PROJECT_SOURCE_DIR}/io_png.cpp
+	${PROJECT_SOURCE_DIR}/io_jpeg.cpp
+	${PROJECT_SOURCE_DIR}/io_gif.cpp
+	${PROJECT_SOURCE_DIR}/imageio.cpp
 )
 
 if(WIN32)
@@ -44,7 +44,6 @@ endif()
 set(LIB_NAME utils)
 add_library(${LIB_NAME} STATIC ${SRC})
 target_link_libraries(${LIB_NAME} png jpeg)
-
 if(WIN32)
 	target_link_libraries(${LIB_NAME} OpenGL32 glu32 glew32)
 endif()

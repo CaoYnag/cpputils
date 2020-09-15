@@ -41,7 +41,8 @@ namespace spes::image
 		virtual ~image_t();
 
 		void init(s32, s32);
-		void init(s32, s32, color_t*);
+        void init(s32, s32, color_t);
+        void init(s32, s32, color_t*);
 		void init(const image_t&);
 
 		inline s32 width() const
@@ -58,6 +59,15 @@ namespace spes::image
 		void set_pixel(s32 x, s32 y, color_t  c);
 		/* draw img at (x, y) */
 		void set_pixels(const image_t&, s32 x, s32 y);
+		/*
+		 * get sub image(x, y, w, h) with default color c
+		 * when a pixel was not in this image, it will be filled with defailt color
+		 * exp:
+		 *      get pixels(-100, -100, 200, 200) from an (100, 100) image
+		 *      means draw src image in right-bottom corner of dst image
+		 *      and other pixels will be filled as default color
+		 * */
+		image_t get_pixels(s32 x, s32 y, s32 w, s32 h, color_t c = Colors::BLACK);
 
 		inline bool valid() const
 		{

@@ -5,14 +5,14 @@ project(cpputils)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 link_directories(
-    ${PROJECT_SOURCE_DIR}/bin
+		${PROJECT_SOURCE_DIR}/bin
 )
 
 if(WIN32 AND NOT MINGW)
 	add_compile_options("/std:c++latest")
 	add_compile_options("/Zc:__cplusplus") # bugs in vs for nlohmann json
 	add_definitions(-DNOMINMAX -D_CRT_SECURE_NO_WARNINGS) # cancel min max macro in vs17
-	
+
 	set(CMAKE_DEBUG_POSTFIX "_d")
 endif()
 if(UNIX OR MINGW)
@@ -24,18 +24,20 @@ endif()
 
 add_subdirectory(cpputils)
 add_subdirectory(tests)
-install(TARGETS utils 
-	LIBRARY DESTINATION lib
-	RUNTIME DESTINATION bin)
-install(FILES 
-	cpputils/type.h
-	cpputils/algo.h
-	cpputils/math.h
-	cpputils/color.h
-	cpputils/image.h
-	cpputils/io_png.h
-	cpputils/imageio.h
-	cpputils/canvas.h
-	cpputils/canvas_func.h
-	DESTINATION include/spes
+install(TARGETS utils
+		LIBRARY DESTINATION lib
+		RUNTIME DESTINATION bin)
+install(FILES
+		cpputils/type.h
+		cpputils/algo.h
+		cpputils/math.h
+		cpputils/color.h
+		cpputils/image.h
+		cpputils/canvas.h
+		cpputils/canvas_func.h
+		cpputils/imageio.h
+		cpputils/io_png.h
+		cpputils/io_jpeg.h
+		cpputils/io_gif.h
+		DESTINATION include/spes
 )
