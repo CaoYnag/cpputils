@@ -24,6 +24,7 @@ endif()
 
 add_subdirectory(cpputils)
 add_subdirectory(tests)
+add_subdirectory(prac)
 install(TARGETS utils
 		LIBRARY DESTINATION lib
 		RUNTIME DESTINATION bin)
