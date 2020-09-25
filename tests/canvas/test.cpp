@@ -1,7 +1,7 @@
 ﻿#include <iostream>
-#include "../../cpputils/canvas.h"
-#include "../../cpputils//imageio.h"
-#include "../../cpputils/math.h"
+#include <spes/canvas.h>
+#include <spes/imageio.h>
+#include <spes/math.h>
 #include <vector>
 #include <stdexcept>
 #include <conio.h>

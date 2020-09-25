@@ -1,8 +1,8 @@
-#include "imageio.h"
-#include "io_png.h"
-#include "io_jpeg.h"
-#include "io_gif.h"
-#include "math.h"
+#include <spes/imageio.h>
+#include <spes/io_png.h>
+#include <spes/io_jpeg.h>
+#include <spes/io_gif.h>
+#include <spes/math.h>
 #include <functional>
 #include <thread>
 #include <map>

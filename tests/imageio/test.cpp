@@ -1,6 +1,6 @@
 ﻿#include <iostream>
-#include "../../cpputils/image.h"
-#include "../../cpputils/imageio.h"
+#include <spes/image.h>
+#include <spes/imageio.h>
 #include <vector>
 #include <stdexcept>
 #include <conio.h>

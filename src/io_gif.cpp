@@ -1,4 +1,4 @@
-#include "io_gif.h"
+#include <spes/io_gif.h>
 #include <gif.h>
 using namespace std;
 

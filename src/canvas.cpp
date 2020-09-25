@@ -1,4 +1,4 @@
-#include "canvas.h"
+#include <spes/canvas.h>
 using namespace std;
 using namespace spes;
 using namespace spes::math;

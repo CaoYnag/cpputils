@@ -4,6 +4,10 @@ project(cpputils)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
+
+include_directories(
+		${PROJECT_SOURCE_DIR}/include
+)
 link_directories(
 		${PROJECT_SOURCE_DIR}/bin
 )
@@ -22,23 +26,14 @@ if(UNIX OR MINGW)
 	endif()
 endif()
 
-add_subdirectory(cpputils)
+add_subdirectory(src)
 add_subdirectory(tests)
 add_subdirectory(prac)
 install(TARGETS utils
 		LIBRARY DESTINATION lib
 		RUNTIME DESTINATION bin)
+file(GLOB header_files "${PROJECT_SOURCE_DIR}/include/spes/*.h")
 install(FILES
-		cpputils/type.h
-		cpputils/algo.h
-		cpputils/math.h
-		cpputils/color.h
-		cpputils/image.h
-		cpputils/canvas.h
-		cpputils/canvas_func.h
-		cpputils/imageio.h
-		cpputils/io_png.h
-		cpputils/io_jpeg.h
-		cpputils/io_gif.h
+		${header_files}
 		DESTINATION include/spes
 )

@@ -1,4 +1,4 @@
-#include "io_png.h"
+#include <spes/io_png.h>
 #include <cstdio>
 #include <png.h>
 using namespace std;

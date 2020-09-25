@@ -1,5 +1,5 @@
 ﻿#include <iostream>
-#include "../../cpputils/algo.h"
+#include <spes/algo.h>
 using namespace std;
 using namespace spes::algo;
 

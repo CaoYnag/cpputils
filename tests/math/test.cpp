@@ -1,7 +1,7 @@
 ﻿#define BOOST_TEST_MODULE test_types
 #include <iostream>
 #include <boost/test/included/unit_test.hpp>
-#include "../../cpputils/math.h"
+#include <spes/math.h>
 #include <vector>
 using namespace std;
 using namespace spes::math;

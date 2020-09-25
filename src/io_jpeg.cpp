@@ -1,7 +1,7 @@
-#include "io_jpeg.h"
+#include <spes/io_jpeg.h>
 #include <cstdio>
 #include <png.h>
-#include "jpeglib.h"
+#include <jpeglib.h>
 #include <cstring>
 using namespace std;
 using namespace spes::image;
