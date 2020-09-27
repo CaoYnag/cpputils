@@ -33,6 +33,11 @@ namespace spes::math
 		return v1.x == v2.x && v1.y == v2.y;
 	}
 
+    std::ostream& operator<<(std::ostream& os, const vector2d& v)
+    {
+	    os << "(" << v.x << ", " << v.y << ")";
+	    return os;
+    }
 
 	f32 cross(vector2d& v1, vector2d& v2)
 	{
@@ -77,7 +82,7 @@ namespace spes::math
 		gen_k();
 	}
 
-	bool line2d::resolv_x(f32 y, f32& x)
+	bool line2d::resolv_x(f32 y, f32& x) const
 	{
 		if (vertical())
 			x = _a.x;
@@ -86,7 +91,7 @@ namespace spes::math
 		return in_range(y, _a.y, _b.y) || in_range(y, _b.y, _a.y);
 	}
 
-	bool line2d::resolv_y(f32 x, f32& y)
+	bool line2d::resolv_y(f32 x, f32& y) const
 	{
 		if (horizontal())
 			y = _a.y;
@@ -94,6 +99,25 @@ namespace spes::math
 			y = (x - _a.x) * _k + _a.y;
 		return in_range(x, _a.x, _b.x) || in_range(x, _b.x, _a.x);
 	}
+
+	bool line2d::contains(const point2d& pt) const
+    {
+	    if(horizontal())
+	        return pt.y == _a.y && (in_range(pt.x, _a.x, _b.x) || in_range(pt.x, _b.x, _a.x));
+	    if(vertical())
+	        return pt.x == _a.x && (in_range(pt.y, _a.y, _b.y) || in_range(pt.y, _b.y, _a.y));
+	    f32 k = (pt.y - _a.y) / (pt.x - _a.x);
+	    return k == _k && (in_range(pt.x, _a.x, _b.x) || in_range(pt.x, _b.x, _a.x)) && (in_range(pt.y, _a.y, _b.y) || in_range(pt.y, _b.y, _a.y));
+    }
+    bool line2d::on(const point2d& pt) const
+    {
+        if(horizontal())
+            return pt.y == _a.y;
+        if(vertical())
+            return pt.x == _a.x;
+        f32 k = (pt.y - _a.y) / (pt.x - _a.x);
+        return k == _k;
+    }
 
 	bool operator==(const line2d& v1, const line2d& v2)
 	{

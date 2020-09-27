@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <iostream>
 #include <cmath>
 #include "type.h"
 using namespace spes;
@@ -85,6 +86,7 @@ namespace spes::math
 	 vector2d operator*(const vector2d& v, f32 s);
 	 bool operator==(const vector2d& v1, const vector2d& v2);
 	 f32 cross(vector2d& v1, vector2d& v2);
+	 std::ostream& operator<<(std::ostream&, const vector2d&);
 
 	/*
 	scale rect, makes it can be included in border
@@ -107,8 +109,13 @@ namespace spes::math
 		void a(const vector2d& p);
 		void b(const vector2d& p);
 
-		bool resolv_x(f32 y, f32& x);
-		bool resolv_y(f32 x, f32& y);
+		/* point on seg */
+		bool contains(const point2d&) const;
+		/* point on line */
+		bool on(const point2d&) const;
+
+		bool resolv_x(f32 y, f32& x) const;
+		bool resolv_y(f32 x, f32& y) const;
 	};
 
 	bool operator==(const line2d& v1, const line2d& v2);

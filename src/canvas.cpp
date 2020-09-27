@@ -1,6 +1,8 @@
 #include <spes/canvas.h>
+#include <spes/algo.h>
 using namespace std;
 using namespace spes;
+using namespace spes::algo;
 using namespace spes::math;
 using namespace spes::color;
 using namespace spes::image;
