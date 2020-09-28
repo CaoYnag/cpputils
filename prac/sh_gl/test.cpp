@@ -64,9 +64,10 @@ void mouse_callback(int button, int state, int x, int y)
         if(button == GLUT_RIGHT_BUTTON)
         {
             if(pts.size() < 1) return;
-            printf("end pick.\n\n");
             polys.emplace_back(pts);
+            int sz = clipped.size();
             sutherland_hodgman(polys[polys.size() - 1], rc, clipped);
+            printf("end pick, split into %d polys.\n\n", (clipped.size() - sz));
             pts.clear();
         }
     }
@@ -105,6 +106,7 @@ void display()
     }
 
     // draw clipped polys
+    glPointSize(2.0);
     glColor3f(1., 1., .0);
     for(auto& poly : clipped)
     {

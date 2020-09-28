@@ -88,6 +88,14 @@ namespace spes::math
 	 f32 cross(vector2d& v1, vector2d& v2);
 	 std::ostream& operator<<(std::ostream&, const vector2d&);
 
+    enum RANGE_COVERAGE_STATE
+    {
+        RCS_CROSS = 0,
+        RCS_INDEPENDENT,
+        RCS_A_COVER_B,
+        RCS_B_COVER_A
+    };
+    int range_coverage(range2d& a, range2d& b);
 	/*
 	scale rect, makes it can be included in border
 	*/

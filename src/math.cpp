@@ -44,6 +44,15 @@ namespace spes::math
 		return v1.x * v2.y - v1.y * v2.x;
 	}
 
+    int range_coverage(range2d& a, range2d& b)
+    {
+        if(a.e < b.s || a.s > b.e) return RCS_INDEPENDENT;
+
+        if(in_range(a.s, b.s, b.e) && in_range(a.e, b.s, b.e)) return RCS_B_COVER_A;
+        if(in_range(b.s, a.s, a.e) && in_range(b.e, a.s, a.e)) return RCS_A_COVER_B;
+        return RCS_CROSS;
+    }
+
 	size2d rect_adjust(size2d border, size2d rect)
 	{
 		if (rect.w > border.w)

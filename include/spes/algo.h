@@ -70,6 +70,7 @@ namespace spes::algo
     KEY GenKey(const spes::math::vector2d& p, const spes::math::rect& r);
     int cohen_sutherland(spes::math::line2d& line, const spes::math::rect& rect);
 
+
     int sutherland_hodgman(const spes::math::polygon2d& src, const spes::math::rect& bnds, std::vector<spes::math::polygon2d>& rslt);
     int sutherland_hodgman(const spes::math::polygon2d& src, const spes::math::polygon2d& bnds, std::vector<spes::math::polygon2d>& rslt);
     int weiler_atherton(const spes::math::polygon2d& src, const spes::math::polygon2d& bnds, std::vector<spes::math::polygon2d>& rslt);
