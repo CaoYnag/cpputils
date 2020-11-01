@@ -23,4 +23,4 @@ set(SRC
 )
 
 add_executable(clhe ${SRC})
-target_link_libraries(clhe utils boost_filesystem)
+target_link_libraries(clhe utils)

@@ -3,14 +3,14 @@
 #include <spes/image.h>
 #include <spes/imageio.h>
 #include <cmath>
-#include <boost/filesystem.hpp>
+#include <filesystem>
 #include <conio.h>
 using namespace std;
 using namespace spes;
 using namespace spes::image;
 using namespace spes::image::io;
 using namespace spes::color;
-using namespace boost::filesystem;
+using namespace std::filesystem;
 
 image_t histogram(const image_t& im)
 {

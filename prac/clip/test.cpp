@@ -9,7 +9,12 @@
 #include <cstdlib>
 #include <ctime>
 #include <cmath>
+#ifdef __unix__
 #include <sys/time.h>
+#endif
+#ifdef WIN32
+#include <Windows.h>
+#endif
 using namespace std;
 using namespace spes;
 using namespace spes::image;
@@ -23,6 +28,15 @@ using namespace spes::canvas;
 #undef YELLOW
 #undef AQUA
 
+#ifdef DEFAULT
+#undef DEFAULT
+#endif
+#ifdef IN
+#undef IN
+#endif
+#ifdef OUT
+#undef OUT
+#endif
 constexpr const int DEFAULT = 0;
 constexpr const int IN = 1;
 constexpr const int OUT = 2;
@@ -1361,9 +1375,14 @@ void test_clip()
 }
 long cur_ms()
 {
+#ifdef __unix__
     timeval tv;
     gettimeofday(&tv, nullptr);
     return tv.tv_sec * 1000 + tv.tv_usec / 1000;
+#endif
+#ifdef WIN32
+    return GetTickCount();
+#endif
 }
 void test_perform()
 {

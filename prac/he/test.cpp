@@ -3,7 +3,7 @@
 #include <spes/image.h>
 #include <spes/imageio.h>
 #include <cmath>
-#include <boost/filesystem.hpp>
+#include <filesystem>
 #include <conio.h>
 #include <vector>
 using namespace std;
@@ -11,7 +11,7 @@ using namespace spes;
 using namespace spes::image;
 using namespace spes::image::io;
 using namespace spes::color;
-using namespace boost::filesystem;
+using namespace std::filesystem;
 
 image_t rgb_he(const image_t& im, int off = 0)
 {

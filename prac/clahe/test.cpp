@@ -3,14 +3,14 @@
 #include <spes/image.h>
 #include <spes/imageio.h>
 #include <cmath>
-#include <boost/filesystem.hpp>
+#include <filesystem>
 #include <conio.h>
 using namespace std;
 using namespace spes;
 using namespace spes::image;
 using namespace spes::image::io;
 using namespace spes::color;
-using namespace boost::filesystem;
+using namespace std::filesystem;
 
 f32 find_limit(f32* array, f32 line)
 {
@@ -19,7 +19,7 @@ f32 find_limit(f32* array, f32 line)
     sort(dist, dist + 256);
     return dist[(int)(line * 255)];
 }
-void he_map(shared_ptr<image_t> tile, color_t* map, f64 limit)
+void he_map(shared_ptr<image_t> tile, /*color_t* map*/vector<color_t>& map, f64 limit)
 {
     auto buff = tile->buffer();
     auto sz = tile->width() * tile->height();
@@ -107,8 +107,10 @@ image_t clahe(image_t& im, int slices, f64 line)
     //img.init(W, H);
     int tw = W / slices, th = H / slices;
     int tile_num = slices * slices;
-    color_t tilemap[tile_num][256];
-    shared_ptr<image_t> tiles[tile_num];
+    vector<vector<color_t>> tilemap;
+    vector<shared_ptr<image_t>> tiles;
+	/*color_t tilemap[tile_num][256];
+	shared_ptr<image_t> tiles[tile_num];*/
 
     for(int y = 0; y < slices; ++y)
     {

@@ -12,13 +12,10 @@ if(WIN32)
 			$ENV{LIB_BASE}/lib
 		)
 	endif()
-
-	if($ENV{Boost_ROOT})
-		message(FATAL_ERROR "env Boost_ROOT not set")
-	else()
-		include_directories(
-			$ENV{Boost_ROOT}/
-		)
+	
+	find_package(Boost 1.67 COMPONENTS)
+	if(Boost_FOUND)
+		include_directories(${Boost_INCLUDE_DIRS})
 	endif()
 endif()
 

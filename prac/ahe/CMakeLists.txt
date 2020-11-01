@@ -23,4 +23,4 @@ set(SRC
 )
 
 add_executable(ahe ${SRC})
-target_link_libraries(ahe utils boost_filesystem)
+target_link_libraries(ahe utils)
