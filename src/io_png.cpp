@@ -103,7 +103,6 @@ namespace spes::image::io
 			fclose(fp);
 			return;
 		}
-
 		png_init_io(png, fp);
 		png_set_sig_bytes(png, sig);
 		png_set_IHDR(png, info, im.width(), im.height(), 8, PNG_COLOR_TYPE_RGBA, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);

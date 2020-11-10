@@ -10,6 +10,7 @@ namespace spes::image
 		IMP_FMT_XRGB,
 		IMP_FMT_RGB,
 		IMP_FMT_GREY,
+        IMP_FMT_GREY16,
 		IMP_FMT_HSV
 	};
 	s32 format_depth(u32 fmt);

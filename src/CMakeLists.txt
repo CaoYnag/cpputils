@@ -15,7 +15,7 @@ set(SRC
 	${PROJECT_SOURCE_DIR}/io_jpeg.cpp
 	${PROJECT_SOURCE_DIR}/io_gif.cpp
 	${PROJECT_SOURCE_DIR}/imageio.cpp
-)
+        ../include/spes/utils.h utils.cpp)
 
 if(WIN32)
 	if($ENV{LIB_BASE})
