@@ -1396,7 +1396,7 @@ void test_perform()
     for(int i = 0; i < CNTS; ++i)
     {
         vector<polygon2d> out;
-        sutherland_hodgman_final(src, rc, out);
+        sutherland_hodgman(src, rc, out);
     }
     long end = cur_ms();
     cout << "cost " << (end - start) << "ms." << endl;
@@ -1406,7 +1406,7 @@ void test_perform()
     for(int i = 0; i < CNTS; ++i)
     {
         vector<polygon2d> out;
-        sutherland_hodgman(src, rc, out);
+        algo::sutherland_hodgman(src, rc, out);
     }
     end = cur_ms();
     cout << "opted cost " << (end - start) << "ms." << endl;
@@ -1419,8 +1419,8 @@ void test_mask()
 int main(int argc, char** argv)
 {
     // test_draw();
-    test_clip();
-    // test_perform();
+    // test_clip();
+    test_perform();
     // test_mask();
 	return 0;
 }

@@ -15,8 +15,10 @@ namespace spes::image
 			return 4;
 		case IMP_FMT_RGB:
 			return 3;
-		case IMP_FMT_GREY:
-			return 1;
+        case IMP_FMT_GREY:
+            return 1;
+        case IMP_FMT_GREY16:
+            return 2;
 		default:
 			return 0;
 		}
