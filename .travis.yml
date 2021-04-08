@@ -1,0 +1,21 @@
+language: cpp
+dist: trusty
+os: linux
+compiler:
+  - g++
+
+jobs:
+  include:
+    - env: COMPILER=g++-8 BUILD=Release
+      compiler: g++
+      addons:
+        apt:
+          update: true
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-8
+            - cmake
+
+script:
+  - make

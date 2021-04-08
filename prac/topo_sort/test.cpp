@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <vector>
 #include <string>
+#include <cstring>
 #include <conio.h>
 using namespace std;
 

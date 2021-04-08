@@ -3,6 +3,8 @@
 #include <spes/imageio.h>
 #include <cmath>
 #include <filesystem>
+#include <cstring>
+#include <algorithm>
 #include <conio.h>
 using namespace std;
 using namespace spes;
