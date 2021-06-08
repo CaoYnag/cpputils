@@ -15,7 +15,7 @@ jobs:
             - ubuntu-toolchain-r-test
           packages:
             - g++-8
-            - cmake
+            - cmake-3.10
 
 script:
   - mkdir build

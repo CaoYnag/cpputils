@@ -66,3 +66,18 @@ BOOST_AUTO_TEST_CASE(rgb_hsv)
 //    cout << "CUST : " << custom << " reved: " << custom_rev << endl;
 
 }
+
+BOOST_AUTO_TEST_CASE(alpha)
+{
+	color_t base(200, 200, 200, 255);
+	color_t a1(255, 0, 0, 0);
+
+	auto c1 = base * a1;
+	BOOST_REQUIRE_EQUAL(c1.r, 200);
+	BOOST_REQUIRE_EQUAL(c1.a, 255);
+
+	color_t a2(255, 0, 0, 255);
+	auto c2 = base * a2;
+	BOOST_REQUIRE_EQUAL(c2.r, 255);
+	BOOST_REQUIRE_EQUAL(c2.a, 255);
+}

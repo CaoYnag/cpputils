@@ -30,7 +30,10 @@ namespace spes::color
 		u8 grey();
 		color_t grey(u8);
 	};
+	/* simple add color, and use bigger alpha */
 	color_t operator+(const color_t& a, const color_t& b);
+	/* merge color with alpha */
+	color_t operator*(const color_t& a, const color_t& b);
 	color_t operator-(const color_t& a, const color_t& b);
     bool operator==(const color_t& a, const color_t& b);
     bool operator!=(const color_t& a, const color_t& b);

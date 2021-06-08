@@ -110,29 +110,56 @@ namespace spes::image
 		_buff[idx(x, y)] = c;
 	}
 
-    void image_t::set_pixels(const image_t& im, s32 px, s32 py)
-    {
-	    if(px >= _w || py >= _h || px <= -im._w || py <= -im._h) return;
-	    int dy = py + im.height();
+	void image_t::set_pixels(const image_t& im, s32 px, s32 py)
+	{
+		if(px >= _w || py >= _h || px <= -im._w || py <= -im._h) return;
+		int dy = py + im.height();
 
-	    int y = py;
-	    if(y < 0) y = 0;
-	    for(; y < dy; ++y)
-        {
-	        if(y >= _h) break;
-	        int x = px;
-	        if(x < 0) x = 0;
+		int y = py;
+		if(y < 0) y = 0;
+		for(; y < dy; ++y)
+		{
+			if(y >= _h) break;
+			int x = px;
+			if(x < 0) x = 0;
 
-	        int src_idx = (y - py) * im._w + (x - px);
-	        int dst_idx = y * _w + x;
-	        int cpy_w = im._w;
-	        if(px < 0)
-	            cpy_w += px;
-	        if(px + im._w > _w)
-	            cpy_w -= (px + im._w) - _w;
-            memcpy(_buff + dst_idx, im._buff + src_idx, cpy_w * 4);
-        }
-    }
+			int src_idx = (y - py) * im._w + (x - px);
+			int dst_idx = y * _w + x;
+			int cpy_w = im._w;
+			if(px < 0)
+				cpy_w += px;
+			if(px + im._w > _w)
+				cpy_w -= (px + im._w) - _w;
+			memcpy(_buff + dst_idx, im._buff + src_idx, cpy_w * 4);
+		}
+	}
+
+	void image_t::draw_img(const image_t& im, s32 px, s32 py)
+	{
+		if(px >= _w || py >= _h || px <= -im._w || py <= -im._h) return;
+		int dy = py + im.height();
+
+		int y = py;
+		if(y < 0) y = 0;
+		for(; y < dy; ++y)
+		{
+			if(y >= _h) break;
+			int x = px;
+			if(x < 0) x = 0;
+
+			int src_idx = (y - py) * im._w + (x - px);
+			int dst_idx = y * _w + x;
+			int cpy_w = im._w;
+			if(px < 0)
+				cpy_w += px;
+			if(px + im._w > _w)
+				cpy_w -= (px + im._w) - _w;
+			color_t* dst = _buff + dst_idx;
+			color_t* src = im._buff + src_idx;
+			for(int idx = 0; idx < cpy_w; ++idx)
+				dst[idx] = dst[idx] * src[idx];
+		}
+	}
 
     image_t image_t::get_pixels(s32 x, s32 y, s32 w, s32 h, color_t c)
     {

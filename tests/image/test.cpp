@@ -109,10 +109,20 @@ void test_hsv()
     image_io::write(rev, "/home/spes/temp/rev_hsv.jpg", IMAGE_FMT_JPEG);
 }
 
+/* render transparent img */
+void test3()
+{
+	auto sakura = image_io::read("/home/spes/temp/sakura512.png");
+	auto base = image_io::read("/home/spes/temp/avatar.png");
+	base.draw_img(sakura, 0, 0);
+	image_io::write(base, "/home/spes/temp/alpha_test.png", IMAGE_FMT_PNG);
+}
+
 int main(int argc, char* argv[])
 {
     //test1();
-    test2();
-    test_hsv();
+    //test2();
+    //test_hsv();
+    test3();
 	return 0;
 }

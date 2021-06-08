@@ -60,6 +60,7 @@ namespace spes::image
 		void set_pixel(s32 x, s32 y, color_t  c);
 		/* draw img at (x, y) */
 		void set_pixels(const image_t&, s32 x, s32 y);
+		void draw_img(const image_t&, s32 x, s32 y);
 		/*
 		 * get sub image(x, y, w, h) with default color c
 		 * when a pixel was not in this image, it will be filled with defailt color

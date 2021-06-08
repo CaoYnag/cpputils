@@ -39,6 +39,15 @@ namespace spes::color
 		u8 aa = a.a > b.a ? a.a : b.a;
 		return color_t(a.r + b.r, a.g + b.g, a.b + b.b, aa);
 	}
+	color_t operator*(const color_t& a, const color_t& b)
+	{
+		f32 s = b.a / 255.f;
+		f32 sp = 1 - s;
+		u8 rr = a.r * sp + s * b.r;
+		u8 gg = a.g * sp + s * b.g;
+		u8 bb = a.b * sp + s * b.b;
+		return color_t(rr, gg, bb, a.a);
+	}
 	color_t operator-(const color_t& a, const color_t& b)
 	{
 		u8 aa = a.a < b.a ? a.a : b.a;
