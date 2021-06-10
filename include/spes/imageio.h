@@ -18,6 +18,7 @@ namespace spes::image::io
 		IMAGE_FMT_GIF
 	};
 
+	u32 image_format(FILE* fp);
 	u32 image_format(const char* path);
 
 	class ImageViewer
@@ -46,8 +47,12 @@ namespace spes::image::io
 	public:
 		static image_t read(const char* path);
 		static void write(image_t&, const char* path, u32 fmt = IMAGE_FMT_PNG);
+		static image_t read(FILE* fp);
+		static void write(image_t&, FILE* fp, u32 fmt = IMAGE_FMT_PNG);
 		static std::vector<image_t> read_anim(const char* path);
 		static void write_anim(std::vector<image_t>&, const char* path, u32 delay, u32 fmt = IMAGE_FMT_GIF);
+		static std::vector<image_t> read_anim(FILE* fp);
+		static void write_anim(std::vector<image_t>&, FILE* fp, u32 delay, u32 fmt = IMAGE_FMT_GIF);
 		static size2d screen_size();
 		static ImageViewer* show_image(const image_t&, std::string title = "ImageView");
 	};

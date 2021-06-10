@@ -5,6 +5,6 @@ using namespace spes::image;
 
 namespace spes::image::io
 {
-	std::vector<image_t> read_gif(const char*);
-	void write_gif(std::vector<image_t>&, const char*, u32 delay);
+	std::vector<image_t> read_gif(FILE*);
+	void write_gif(std::vector<image_t>&, FILE*, u32 delay);
 }

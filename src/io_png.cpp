@@ -9,25 +9,26 @@ namespace spes::image::io
 	{
 		return !png_sig_cmp((png_const_bytep)buff, 0, len);
 	}
-	image_t read_png(const char* file)
+	image_t read_png(FILE* fp)
 	{
 		image_t im;
-		FILE* fp;
-		if ((fp = fopen(file, "rb")) == nullptr)
+		if (!fp)
+		{
+			perror("invalid fp in read_png");
 			return im;
-
+		}
 		auto png = png_create_read_struct(PNG_LIBPNG_VER_STRING, nullptr, nullptr, nullptr);
 
-		if (png == nullptr)
+		if (!png)
 		{
-			fclose(fp);
+			perror("init png read failed.");
 			return im;
 		}
 
 		auto info = png_create_info_struct(png);
-		if (info == nullptr)
+		if (!info)
 		{
-			fclose(fp);
+			perror("init png info failed.");
 			png_destroy_read_struct(&png, nullptr, nullptr);
 			return im;
 		}
@@ -35,7 +36,6 @@ namespace spes::image::io
 		if (setjmp(png_jmpbuf(png)))
 		{
 			png_destroy_read_struct(&png, &info, nullptr);
-			fclose(fp);
 			return im;
 		}
 
@@ -43,7 +43,6 @@ namespace spes::image::io
 		png_init_io(png, fp);
 		png_set_sig_bytes(png, sig);
 		png_read_png(png, info, PNG_TRANSFORM_EXPAND, nullptr);
-		PNG_COLOR_TYPE_RGBA;
 
 		png_bytep* rps = png_get_rows(png, info);
 
@@ -68,31 +67,32 @@ namespace spes::image::io
 		}
 
 		png_destroy_read_struct(&png, &info, nullptr);
-		fclose(fp);
 		return im;
 	}
-	void write_png(image_t& im, const char* file)
+	void write_png(image_t& im, FILE* fp)
 	{
 		png_structp png;
 		png_infop info;
 
 		int sig = 0;
-		FILE* fp;
-		if ((fp = fopen(file, "wb")) == nullptr)
+		if (!fp)
+		{
+			perror("invalid fp in write_png");
 			return;
+		}
 
 		png = png_create_write_struct(PNG_LIBPNG_VER_STRING, nullptr, nullptr, nullptr);
 
-		if (png == nullptr)
+		if (!png)
 		{
-			fclose(fp);
+			perror("init png write failed.");
 			return;
 		}
 
 		info = png_create_info_struct(png);
 		if (info == nullptr)
 		{
-			fclose(fp);
+			perror("init png info failed.");
 			png_destroy_write_struct(&png, nullptr);
 			return;
 		}
@@ -100,7 +100,6 @@ namespace spes::image::io
 		if (setjmp(png_jmpbuf(png)))
 		{
 			png_destroy_write_struct(&png, &info);
-			fclose(fp);
 			return;
 		}
 		png_init_io(png, fp);
@@ -117,6 +116,5 @@ namespace spes::image::io
 
 		delete[] rps;
 		png_destroy_write_struct(&png, &info);
-		fclose(fp);
 	}
 }

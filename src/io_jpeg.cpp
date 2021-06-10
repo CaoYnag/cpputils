@@ -31,33 +31,32 @@ namespace spes::image::io
 		longjmp(myerr->env, 1);
 	}
 	
-	image_t read_jpeg(const char* path)
+	image_t read_jpeg(FILE* fp)
 	{
+		image_t im;
+		if(!fp)
+		{
+			fprintf(stderr, "invalid fp in %s", __func__);
+			return im;
+		}
 		jpeg_decompress_struct cinfo;
 		my_error_mgr jerr;
 
-		FILE* infile;
 		JSAMPARRAY buffer;
 		int row_stride;
 		jmp_buf env;
 
-		image_t im;
 
-		if ((infile = fopen(path, "rb")) == NULL) {
-			fprintf(stderr, "can't open %s\n", path);
-			return im;
-		}
 		cinfo.err = jpeg_std_error(&jerr.pub);
 		jerr.pub.error_exit = my_error_exit;
 
 		if (setjmp(jerr.env)) {
 			jpeg_destroy_decompress(&cinfo);
-			fclose(infile);
 			return im;
 		}
 		jpeg_create_decompress(&cinfo);
 
-		jpeg_stdio_src(&cinfo, infile);
+		jpeg_stdio_src(&cinfo, fp);
 
 		(void)jpeg_read_header(&cinfo, TRUE);
 		im_buff buff(cinfo.image_width, cinfo.image_height, IMP_FMT_RGB);
@@ -76,30 +75,28 @@ namespace spes::image::io
 
 		(void)jpeg_finish_decompress(&cinfo);
 		jpeg_destroy_decompress(&cinfo);
-		fclose(infile);
 
 		return image_transform(buff);
 	}
 
-	void write_jpeg(image_t& im, const char* path, int quality)
+	void write_jpeg(image_t& im, FILE* fp, int quality)
 	{
+		if (!fp) {
+			fprintf(stderr, "error fp in %s", __func__);
+			return;
+		}
 		im_buff buff = image_transform(im, IMP_FMT_RGB);
 
 		jpeg_compress_struct cinfo;
 		struct jpeg_error_mgr jerr;
 
-		FILE* outfile;
 		JSAMPROW row_pointer[1];
 		int row_stride;
 
 		cinfo.err = jpeg_std_error(&jerr);
 		jpeg_create_compress(&cinfo);
 
-		if ((outfile = fopen(path, "wb")) == NULL) {
-			fprintf(stderr, "can't open %s\n", path);
-			return;
-		}
-		jpeg_stdio_dest(&cinfo, outfile);
+		jpeg_stdio_dest(&cinfo, fp);
 
 		cinfo.image_width = buff.w;
 		cinfo.image_height = buff.h;
@@ -122,7 +119,6 @@ namespace spes::image::io
 			(void)jpeg_write_scanlines(&cinfo, row_pointer, 1);
 		}
 		jpeg_finish_compress(&cinfo);
-		fclose(outfile);
 		jpeg_destroy_compress(&cinfo);
 	}
 }

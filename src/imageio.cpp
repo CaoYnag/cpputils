@@ -346,15 +346,13 @@ namespace spes::image::io
 		return viewer;
 	}
 
-	u32 image_format(const char* path)
+	u32 image_format(FILE* fp)
 	{
+		if (!fp) return IMAGE_FMT_UNKNOWN;
 		constexpr u32 BYTES_TO_CHECK = 4;
 		constexpr u32 BYTES_TO_READ = BYTES_TO_CHECK + 1;
 		char buff[BYTES_TO_READ];
-		FILE* fp = fopen(path, "r");
-		if (!fp) return IMAGE_FMT_UNKNOWN;
 		fgets(buff, BYTES_TO_READ, fp);
-		fclose(fp);
 		if (png_sig_check(buff, BYTES_TO_CHECK))
 			return IMAGE_FMT_PNG;
 		if (jpeg_sig_check(buff, BYTES_TO_CHECK))
@@ -362,18 +360,41 @@ namespace spes::image::io
 
 		return IMAGE_FMT_UNKNOWN;
 	}
-
-	image_t image_io::read(const char* path)
+	u32 image_format(const char* path)
 	{
-		switch (image_format(path))
+		FILE* fp = fopen(path, "r");
+		auto ret = image_format(fp);
+		fclose(fp);
+		return ret;
+	}
+
+	image_t image_io::read(FILE* fp)
+	{
+		switch (image_format(fp))
 		{
 		case IMAGE_FMT_JPG:
 		case IMAGE_FMT_JPEG:
-			return read_jpeg(path);
+			return read_jpeg(fp);
 		case IMAGE_FMT_PNG:
-			return read_png(path);
+			return read_png(fp);
 		case IMAGE_FMT_BMP:
 		default: break;
+		}
+		return image_t();
+	}
+
+	image_t image_io::read(const char* path)
+	{
+		FILE* fp = fopen(path, "rb");
+		switch (image_format(fp))
+		{
+			case IMAGE_FMT_JPG:
+			case IMAGE_FMT_JPEG:
+				return read_jpeg(path);
+			case IMAGE_FMT_PNG:
+				return read_png(path);
+			case IMAGE_FMT_BMP:
+			default: break;
 		}
 		return image_t();
 	}

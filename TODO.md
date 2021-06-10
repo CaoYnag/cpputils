@@ -1,9 +1,11 @@
 # TODO
 
-## ImageIO
+## Image && ImageIO
 
-- [ ] add jpg support
+- [x] add jpg support
 - [ ] add bmp support
+- [ ] use shared_ptr instead of image_t
+- [ ] add fp r/w ability check
 
 ## Canvas
 
