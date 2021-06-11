@@ -21,11 +21,11 @@ f32 find_limit(f32* array, f32 line)
     return dist[(int)(line * 255)];
 }
 
-image_t clhe_rgb(const image_t& im, f64 limit)
+shared_ptr<image_t> clhe_rgb(shared_ptr<image_t> im, f64 limit)
 {
-    image_t img(im);
-    auto buff = img.buffer();
-    auto sz = img.width() * img.height();
+	auto img = make_shared<image_t>(im);
+    auto buff = img->buffer();
+    auto sz = img->width() * img->height();
     f32 r_dist[256] = {.0f}, g_dist[256] = {.0f}, b_dist[256] = {.0f};
     float w = 1.f / sz;
 

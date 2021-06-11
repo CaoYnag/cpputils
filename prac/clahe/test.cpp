@@ -102,10 +102,10 @@ void regrey_linear(shared_ptr<image_t> tile, color_t* m, color_t* m2)
     }
 }
 
-image_t clahe(image_t& im, int slices, f64 line)
+shared_ptr<image_t> clahe(shared_ptr<image_t> im, int slices, f64 line)
 {
-    int W = im.width(), H = im.height();
-    image_t img(im);
+    int W = im->width(), H = im->height();
+    auto img = make_shared<image_t>(im);
     //img.init(W, H);
     int tw = W / slices, th = H / slices;
     int tile_num = slices * slices;
@@ -124,8 +124,7 @@ image_t clahe(image_t& im, int slices, f64 line)
             int ph = th;
 
             int idx = y * slices + x;
-            tiles[idx] = make_shared<image_t>();
-            tiles[idx]->init(im.get_pixels(px, py, pw, ph));
+            tiles[idx] = im->get_pixels(px, py, pw, ph);
             he_map(tiles[idx], tilemap[idx], line);
 
 //            auto tilehe = rgb_he(*tiles[idx], 0);
@@ -233,7 +232,7 @@ image_t clahe(image_t& im, int slices, f64 line)
             int idx = y * slices + x;
             //regrey(tiles[idx], tilemap[idx]);
 
-            img.set_pixels(*tiles[idx], px, py);
+            img->set_pixels(tiles[idx], px, py);
         }
     }
 

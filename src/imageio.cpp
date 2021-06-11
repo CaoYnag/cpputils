@@ -23,9 +23,9 @@ using namespace spes::image;
 
 namespace spes::image::io
 {
-	ImageViewer::ImageViewer(image_t im, std::string tt) : _im(move(im)), _tt(tt)
+	ImageViewer::ImageViewer(shared_ptr<image_t> im, std::string tt) : _im(move(im)), _tt(tt)
 	{
-		_sz = rect_adjust(image_io::screen_size(), { (f32)im.width(), (f32)im.height() });
+		_sz = rect_adjust(image_io::screen_size(), { (f32)im->width(), (f32)im->height() });
 	}
 	ImageViewer::~ImageViewer()
 	{}
@@ -251,7 +251,7 @@ namespace spes::image::io
         GtkWidget* _wnd;
         GtkWidget* _img;
 	public:
-		UnixImageViewer(const image_t& im, string tt) : ImageViewer(im, tt)
+		UnixImageViewer(shared_ptr<image_t> im, string tt) : ImageViewer(im, tt)
 		{
 		}
 		virtual ~UnixImageViewer()
@@ -328,7 +328,7 @@ namespace spes::image::io
 #endif
 	}
 
-	ImageViewer* image_io::show_image(const image_t& im, string title)
+	ImageViewer* image_io::show_image(shared_ptr<image_t> im, string title)
 	{
 		ImageViewer* viewer = nullptr;
 #ifdef WIN32
@@ -368,7 +368,7 @@ namespace spes::image::io
 		return ret;
 	}
 
-	image_t image_io::read(FILE* fp)
+	shared_ptr<image_t> image_io::read(FILE* fp)
 	{
 		switch (image_format(fp))
 		{
@@ -380,45 +380,51 @@ namespace spes::image::io
 		case IMAGE_FMT_BMP:
 		default: break;
 		}
-		return image_t();
+		return make_shared<image_t>();
 	}
 
-	image_t image_io::read(const char* path)
+	shared_ptr<image_t> image_io::read(const char* path)
 	{
-		FILE* fp = fopen(path, "rb");
+		FILE* fp = fopen(path, "rb+");
+		auto ret = make_shared<image_t>();
 		switch (image_format(fp))
 		{
 			case IMAGE_FMT_JPG:
 			case IMAGE_FMT_JPEG:
-				return read_jpeg(path);
+				ret = read_jpeg(fp); break;
 			case IMAGE_FMT_PNG:
-				return read_png(path);
+				ret = read_png(fp); break;
 			case IMAGE_FMT_BMP:
 			default: break;
 		}
-		return image_t();
+		fclose(fp);
+		return ret;
 	}
 
-	void image_io::write(image_t& im, const char* path, u32 fmt)
+	void image_io::write(shared_ptr<image_t> im, const char* path, u32 fmt)
 	{
+		FILE* fp = fopen(path, "wb+");
 		switch (fmt)
 		{
 		case IMAGE_FMT_PNG:
-			write_png(im, path); break;
+			write_png(im, fp); break;
 		case IMAGE_FMT_JPG:
 		case IMAGE_FMT_JPEG:
-			write_jpeg(im, path); break;
+			write_jpeg(im, fp); break;
 		default:
 			break;
 		}
+		fclose(fp);
 	}
 
-	std::vector<image_t> read_anim(const char* path)
+	std::vector<shared_ptr<image_t>> read_anim(const char* path)
 	{
 		return {};
 	}
-	void write_anim(std::vector<image_t>& ims, const char* path, u32 delay, u32 fmt)
+	void write_anim(std::vector<shared_ptr<image_t>>& ims, const char* path, u32 delay, u32 fmt)
 	{
-		write_gif(ims, path, delay);
+		FILE* fp = fopen(path, "wb+");
+		write_gif(ims, fp, delay);
+		fclose(fp);
 	}
 }

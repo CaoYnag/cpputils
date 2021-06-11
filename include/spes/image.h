@@ -1,6 +1,8 @@
 #pragma once
 #include "color.h"
+#include <memory>
 using namespace spes::color;
+using namespace std;
 
 namespace spes::image
 {
@@ -20,7 +22,9 @@ namespace spes::image
         s32 w, h, fmt;
 		im_buff(s32 w, s32 h, u32 fmt);
 		im_buff(s32 w, s32 h, u32 fmt, u8* data);
+		/* deprecated in future */
 		im_buff(const im_buff& o);
+		im_buff(shared_ptr<im_buff> o);
 		virtual ~im_buff();
 	};
 
@@ -38,13 +42,17 @@ namespace spes::image
 		}
 	public:
 		image_t();
+		/* deprecated in future */
 		image_t(const image_t&);
+		image_t(shared_ptr<image_t>);
 		virtual ~image_t();
 
 		void init(s32, s32);
         void init(s32, s32, color_t);
         void init(s32, s32, color_t*);
+        /* deprecated in future */
 		void init(const image_t&);
+		void init(shared_ptr<image_t>);
 
 		inline s32 width() const
 		{
@@ -59,8 +67,8 @@ namespace spes::image
 		color_t get_pixel(s32 x, s32 y) const;
 		void set_pixel(s32 x, s32 y, color_t  c);
 		/* draw img at (x, y) */
-		void set_pixels(const image_t&, s32 x, s32 y);
-		void draw_img(const image_t&, s32 x, s32 y);
+		void set_pixels(shared_ptr<image_t>, s32 x, s32 y);
+		void draw_img(shared_ptr<image_t>, s32 x, s32 y);
 		/*
 		 * get sub image(x, y, w, h) with default color c
 		 * when a pixel was not in this image, it will be filled with defailt color
@@ -69,7 +77,7 @@ namespace spes::image
 		 *      means draw src image in right-bottom corner of dst image
 		 *      and other pixels will be filled as default color
 		 * */
-		image_t get_pixels(s32 x, s32 y, s32 w, s32 h, color_t c = Colors::BLACK);
+		shared_ptr<image_t> get_pixels(s32 x, s32 y, s32 w, s32 h, color_t c = Colors::BLACK);
 
 		inline bool valid() const
 		{
@@ -77,7 +85,8 @@ namespace spes::image
 		}
 	};
 	bool operator!(const image_t&);
+	bool operator!(shared_ptr<image_t> im);
 
-	image_t image_transform(const im_buff&);
-	im_buff image_transform(image_t&, u32 fmt);
+	shared_ptr<image_t> image_transform(shared_ptr<im_buff>);
+	shared_ptr<im_buff> image_transform(shared_ptr<image_t>, u32 fmt);
 }

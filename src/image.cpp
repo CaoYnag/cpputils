@@ -1,5 +1,6 @@
 #include <spes/image.h>
 #include <cstring>
+using namespace std;
 
 namespace spes::image
 {
@@ -40,16 +41,26 @@ namespace spes::image
 		else
 			memset(buff, 0, sz * dep);
 	}
-    im_buff::im_buff(const im_buff& o) : w(o.w), h(o.h), fmt(o.fmt)
-    {
-	    u32 sz = w * h;
-        s32 dep = format_depth(fmt);
-        buff = new u8[sz * dep];
-        if (o.buff)
-            memcpy(buff, o.buff, sz * dep);
-        else
-            memset(buff, 0, sz * dep);
-    }
+	im_buff::im_buff(const im_buff& o) : w(o.w), h(o.h), fmt(o.fmt)
+	{
+		u32 sz = w * h;
+		s32 dep = format_depth(fmt);
+		buff = new u8[sz * dep];
+		if (o.buff)
+			memcpy(buff, o.buff, sz * dep);
+		else
+			memset(buff, 0, sz * dep);
+	}
+	im_buff::im_buff(shared_ptr<im_buff> o) : w(o->w), h(o->h), fmt(o->fmt)
+	{
+		u32 sz = w * h;
+		s32 dep = format_depth(fmt);
+		buff = new u8[sz * dep];
+		if (o->buff)
+			memcpy(buff, o->buff, sz * dep);
+		else
+			memset(buff, 0, sz * dep);
+	}
 	im_buff::~im_buff()
 	{}
 
@@ -57,6 +68,10 @@ namespace spes::image
 	{
 	}
 	image_t::image_t(const image_t& im) : _init(false), _buff(nullptr)
+	{
+		init(im);
+	}
+	image_t::image_t(shared_ptr<image_t> im) : _init(false), _buff(nullptr)
 	{
 		init(im);
 	}
@@ -92,6 +107,10 @@ namespace spes::image
 	{
 		init(image._w, image._h, image._buff);
 	}
+	void image_t::init(shared_ptr<image_t> image)
+	{
+		init(image->_w, image->_h, image->_buff);
+	}
 	image_t::~image_t()
 	{
 		if (_buff) delete[] _buff;
@@ -110,10 +129,10 @@ namespace spes::image
 		_buff[idx(x, y)] = c;
 	}
 
-	void image_t::set_pixels(const image_t& im, s32 px, s32 py)
+	void image_t::set_pixels(shared_ptr<image_t> im, s32 px, s32 py)
 	{
-		if(px >= _w || py >= _h || px <= -im._w || py <= -im._h) return;
-		int dy = py + im.height();
+		if(px >= _w || py >= _h || px <= -im->_w || py <= -im->_h) return;
+		int dy = py + im->height();
 
 		int y = py;
 		if(y < 0) y = 0;
@@ -123,21 +142,21 @@ namespace spes::image
 			int x = px;
 			if(x < 0) x = 0;
 
-			int src_idx = (y - py) * im._w + (x - px);
+			int src_idx = (y - py) * im->_w + (x - px);
 			int dst_idx = y * _w + x;
-			int cpy_w = im._w;
+			int cpy_w = im->_w;
 			if(px < 0)
 				cpy_w += px;
-			if(px + im._w > _w)
-				cpy_w -= (px + im._w) - _w;
-			memcpy(_buff + dst_idx, im._buff + src_idx, cpy_w * 4);
+			if(px + im->_w > _w)
+				cpy_w -= (px + im->_w) - _w;
+			memcpy(_buff + dst_idx, im->_buff + src_idx, cpy_w * 4);
 		}
 	}
 
-	void image_t::draw_img(const image_t& im, s32 px, s32 py)
+	void image_t::draw_img(shared_ptr<image_t> im, s32 px, s32 py)
 	{
-		if(px >= _w || py >= _h || px <= -im._w || py <= -im._h) return;
-		int dy = py + im.height();
+		if(px >= _w || py >= _h || px <= -im->_w || py <= -im->_h) return;
+		int dy = py + im->height();
 
 		int y = py;
 		if(y < 0) y = 0;
@@ -147,24 +166,23 @@ namespace spes::image
 			int x = px;
 			if(x < 0) x = 0;
 
-			int src_idx = (y - py) * im._w + (x - px);
+			int src_idx = (y - py) * im->_w + (x - px);
 			int dst_idx = y * _w + x;
-			int cpy_w = im._w;
+			int cpy_w = im->_w;
 			if(px < 0)
 				cpy_w += px;
-			if(px + im._w > _w)
-				cpy_w -= (px + im._w) - _w;
+			if(px + im->_w > _w)
+				cpy_w -= (px + im->_w) - _w;
 			color_t* dst = _buff + dst_idx;
-			color_t* src = im._buff + src_idx;
+			color_t* src = im->_buff + src_idx;
 			for(int idx = 0; idx < cpy_w; ++idx)
 				dst[idx] = dst[idx] * src[idx];
 		}
 	}
-
-    image_t image_t::get_pixels(s32 x, s32 y, s32 w, s32 h, color_t c)
+    shared_ptr<image_t> image_t::get_pixels(s32 x, s32 y, s32 w, s32 h, color_t c)
     {
-        image_t dst;
-        dst.init(w, h, c);
+		auto dst = make_shared<image_t>();
+        dst->init(w, h, c);
         s32 dx = 0, dy = 0;
         s32 sx = x, sy = y, sw = w, sh = h;
         if(sx < 0)
@@ -185,46 +203,46 @@ namespace spes::image
         for(int yi = 0; yi < sh; ++ yi)
         {
             auto src_buf = _buff + _w * (yi + sy) + sx;
-            auto dst_buf = dst._buff + dst._w * (yi + dy) + dx;
+            auto dst_buf = dst->_buff + dst->_w * (yi + dy) + dx;
             memcpy(dst_buf, src_buf, sw * BAND_NUM);
         }
         return dst;
     }
 
-	image_t image_transform(const im_buff& buff)
+    shared_ptr<image_t> image_transform(shared_ptr<im_buff> buff)
 	{
-		image_t im;
+		auto im = make_shared<image_t>();
 
-		if (buff.fmt == IMP_FMT_ARGB || buff.fmt == IMP_FMT_XRGB)
+		if (buff->fmt == IMP_FMT_ARGB || buff->fmt == IMP_FMT_XRGB)
 		{
-			im.init(buff.w, buff.h, (color_t*)buff.buff);
+			im->init(buff->w, buff->h, (color_t*)buff->buff);
 			return im;
 		}
-		else im.init(buff.w, buff.h);
+		else im->init(buff->w, buff->h);
 
-		auto dst = im.buffer();
-		auto src = buff.buff;
+		auto dst = im->buffer();
+		auto src = buff->buff;
 
-		auto sz = buff.w * buff.h;
+		auto sz = buff->w * buff->h;
 		for (u32 idx = 0; idx < sz; ++idx)
 		{
 			color_t c = 0x0;
-			switch (buff.fmt)
+			switch (buff->fmt)
 			{
-			case IMP_FMT_RGB:
-            {
-                c = color_t(src[idx * 3], src[idx * 3 + 1], src[idx * 3 + 2], 0xff);
-            }break;
-			case IMP_FMT_GREY:
-            {
-                c = color_t(src[idx], src[idx], src[idx], 0xff);
-            }break;
-            case IMP_FMT_HSV:
-            {
-                hsv_t* fsrc = (hsv_t*)src;
-                c = from_hsv(fsrc[idx]);
-            }break;
-			default:break;
+				case IMP_FMT_RGB:
+				{
+					c = color_t(src[idx * 3], src[idx * 3 + 1], src[idx * 3 + 2], 0xff);
+				}break;
+				case IMP_FMT_GREY:
+				{
+					c = color_t(src[idx], src[idx], src[idx], 0xff);
+				}break;
+				case IMP_FMT_HSV:
+				{
+					hsv_t* fsrc = (hsv_t*)src;
+					c = from_hsv(fsrc[idx]);
+				}break;
+				default:break;
 			}
 			dst[idx] = c;
 		}
@@ -232,47 +250,51 @@ namespace spes::image
 		return im;
 	}
 
-	im_buff image_transform(image_t& im, u32 fmt)
+	shared_ptr<im_buff> image_transform(shared_ptr<image_t> im, u32 fmt)
 	{
 		if (fmt == IMP_FMT_ARGB || fmt == IMP_FMT_XRGB)
-			return im_buff(im.width(), im.height(), fmt, (u8*)im.buffer());
-		im_buff buff(im.width(), im.height(), fmt);
+			return make_shared<im_buff>(im->width(), im->height(), fmt, (u8*)im->buffer());
+		auto buff = make_shared<im_buff>(im->width(), im->height(), fmt);
 
-		auto dst = buff.buff;
-		auto src = im.buffer();
-		u32 sz = im.width() * im.height();
-		
+		auto dst = buff->buff;
+		auto src = im->buffer();
+		u32 sz = im->width() * im->height();
+
 		for (u32 idx = 0; idx < sz; ++idx)
 		{
 			color_t c = src[idx];
 			switch (fmt)
 			{
-			case IMP_FMT_RGB:
-			{
-				dst[idx * 3] = c.r;
-				dst[idx * 3 + 1] = c.g;
-				dst[idx * 3 + 2] = c.b;
-			}break;
-			case IMP_FMT_GREY:
-			{
-				// assume src image is grey, so  r == g == b
-				dst[idx] = c.r;
-			}break;
-            case IMP_FMT_HSV:
-            {
-                hsv_t* ndst = (hsv_t*)dst;
-                ndst[idx] = to_hsv(c);
-            }break;
-			default: break;
+				case IMP_FMT_RGB:
+				{
+					dst[idx * 3] = c.r;
+					dst[idx * 3 + 1] = c.g;
+					dst[idx * 3 + 2] = c.b;
+				}break;
+				case IMP_FMT_GREY:
+				{
+					// assume src image is grey, so  r == g == b
+					dst[idx] = c.r;
+				}break;
+				case IMP_FMT_HSV:
+				{
+					hsv_t* ndst = (hsv_t*)dst;
+					ndst[idx] = to_hsv(c);
+				}break;
+				default: break;
 			}
 		}
 
 		return buff;
 	}
 
-
 	bool operator!(const image_t& im)
 	{
 		return !im.valid();
+	}
+
+	bool operator!(shared_ptr<image_t> im)
+	{
+		return !(im || im->valid());
 	}
 }

@@ -13,11 +13,11 @@ using namespace spes::image::io;
 using namespace spes::color;
 using namespace std::filesystem;
 
-image_t rgb_he(const image_t& im, int off = 0)
+shared_ptr<image_t> rgb_he(shared_ptr<image_t> im, int off = 0)
 {
-    image_t img(im);
-    auto buff = img.buffer();
-    auto sz = img.width() * img.height();
+	auto img = make_shared<image_t>(im);
+    auto buff = img->buffer();
+    auto sz = img->width() * img->height();
     float r_dist[256] = {.0f};
     float g_dist[256] = {.0f};
     float b_dist[256] = {.0f};
@@ -52,11 +52,11 @@ image_t rgb_he(const image_t& im, int off = 0)
     return img;
 }
 
-image_t histogram(const image_t& im, int off = 0)
+shared_ptr<image_t> histogram(shared_ptr<image_t> im, int off = 0)
 {
-    image_t img(im);
-    auto buff = img.buffer();
-    auto sz = img.width() * img.height();
+	auto img = make_shared<image_t>(im);
+    auto buff = img->buffer();
+    auto sz = img->width() * img->height();
     float grey_dist[256] = {.0f};
     float w = 1.f / sz;
 

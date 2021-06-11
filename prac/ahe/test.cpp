@@ -163,11 +163,11 @@ void regrey_linear(shared_ptr<image_t> tile, color_t* m, color_t* m2)
     }
 }
 
-image_t the(image_t& im, int slices = 8)
+shared_ptr<image_t> the(shared_ptr<image_t> im, int slices = 8)
 {
-    int W = im.width(), H = im.height();
-    image_t img;
-    img.init(W, H);
+    int W = im->width(), H = im->height();
+    auto img = make_shared<image_t>();
+    img->init(W, H);
     int tw = W / slices, th = H / slices;
     int tile_num = slices * slices; 
     vector<vector<color_t>> tilemap;
@@ -185,8 +185,7 @@ image_t the(image_t& im, int slices = 8)
             int ph = th;
 
             int idx = y * slices + x;
-            tiles[idx] = make_shared<image_t>();
-            tiles[idx]->init(im.get_pixels(px, py, pw, ph));
+            tiles[idx] = im->get_pixels(px, py, pw, ph);
             he_map(tiles[idx], tilemap[idx]);
 
 //            auto tilehe = rgb_he(*tiles[idx], 0);
@@ -294,7 +293,7 @@ image_t the(image_t& im, int slices = 8)
             int idx = y * slices + x;
             //regrey(tiles[idx], tilemap[idx]);
 
-            img.set_pixels(*tiles[idx], px, py);
+            img->set_pixels(tiles[idx], px, py);
         }
     }
 

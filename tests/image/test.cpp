@@ -59,7 +59,7 @@ void test1()
     }
     else
     {
-        cout << "img size (" << jim.width() << " * " << jim.height() << ")" << endl;
+        cout << "img size (" << jim->width() << " * " << jim->height() << ")" << endl;
         image_io::show_image(jim, "Jpeg Image");
         image_io::write(jim, jpeg_write_path, IMAGE_FMT_JPEG);
     }
@@ -76,18 +76,18 @@ void test1()
 void test2()
 {
     auto shit = image_io::read("/home/spes/Resource/res/yuutsu.jpg");// 165x177
-    image_t im;
-    im.init(600, 600);
-    im.set_pixels(shit, -100, -100);
-    im.set_pixels(shit, 100, 100);
-    im.set_pixels(shit, 500, 500);
+    auto im = make_shared<image_t>();
+    im->init(600, 600);
+    im->set_pixels(shit, -100, -100);
+    im->set_pixels(shit, 100, 100);
+    im->set_pixels(shit, 500, 500);
     image_io::write(im, "/home/spes/temp/image_render.jpg", IMAGE_FMT_JPEG);
 
-    auto sub1 = shit.get_pixels(0, 0, 100, 100);
+    auto sub1 = shit->get_pixels(0, 0, 100, 100);
     image_io::write(sub1, "/home/spes/temp/image_sub1.jpg", IMAGE_FMT_JPEG);
-    auto sub2 = shit.get_pixels(-50, -50, 100, 100);
+    auto sub2 = shit->get_pixels(-50, -50, 100, 100);
     image_io::write(sub2, "/home/spes/temp/image_sub2.jpg", IMAGE_FMT_JPEG);
-    auto sub3 = shit.get_pixels(0, 0, 300, 300);
+    auto sub3 = shit->get_pixels(0, 0, 300, 300);
     image_io::write(sub3, "/home/spes/temp/image_sub3.jpg", IMAGE_FMT_JPEG);
 }
 
@@ -95,10 +95,10 @@ void test_hsv()
 {
     printf("hsv size: %d\n", sizeof(hsv_t));
     auto shit = image_io::read("/home/spes/Resource/res/yuutsu.jpg");// 165x177
-    color_t first = shit.buffer()[0];
+    color_t first = shit->buffer()[0];
     auto hsv = to_hsv(first);
     auto buff = image_transform(shit, IMP_FMT_HSV);
-    hsv_t* hsvbuff = (hsv_t*)buff.buff;
+    hsv_t* hsvbuff = (hsv_t*)buff->buff;
     auto hsvfirst = hsvbuff[0];
     auto c = from_hsv(hsvfirst);
     printf("equals: %d, hsv first: (%.2f, %.2f, %.2f), to hsv(%.2f, %.2f, %.2f)\n",
@@ -114,7 +114,7 @@ void test3()
 {
 	auto sakura = image_io::read("/home/spes/temp/sakura512.png");
 	auto base = image_io::read("/home/spes/temp/avatar.png");
-	base.draw_img(sakura, 0, 0);
+	base->draw_img(sakura, 0, 0);
 	image_io::write(base, "/home/spes/temp/alpha_test.png", IMAGE_FMT_PNG);
 }
 

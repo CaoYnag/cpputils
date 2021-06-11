@@ -4,7 +4,7 @@
 
 - [x] add jpg support
 - [ ] add bmp support
-- [ ] use shared_ptr instead of image_t
+- [x] use shared_ptr instead of image_t
 - [ ] add fp r/w ability check
 
 ## Canvas
@@ -14,4 +14,4 @@
 ## Algos
 
 - [ ] general sutherland-hodgman
-- [ ] split polygon with `holes`, rect specified sutherland-hodgman
+- [x] split polygon with `holes`, rect specified sutherland-hodgman

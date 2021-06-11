@@ -29,20 +29,20 @@ namespace spes::canvas
 	class Canvas
 	{
 	protected:
-		image_t _im;
+		std::shared_ptr<image_t> _im;
 		u64 _size;
 		color_t* _buff;
 		rect _rc;
 		size2d _sz;
 
-		inline u32 idx(u32 x, u32 y) const { return x + y * _im.width(); }
-		inline u32 idx(const point2d& p) const { return p.x + p.y * _im.width(); }
+		inline u32 idx(u32 x, u32 y) const { return x + y * _im->width(); }
+		inline u32 idx(const point2d& p) const { return p.x + p.y * _im->width(); }
 	public:
 		Canvas(u32 w, u32 h, color_t bk = Colors::WHITE);
-		Canvas(image_t& im);
+		Canvas(shared_ptr<image_t> im);
 		virtual ~Canvas();
 
-		inline image_t& image() { return _im; }
+		inline shared_ptr<image_t> image() { return _im; }
 	public:
 		virtual void draw(u32 mode, const std::vector<point2d>& pts, color_t c = Colors::BLACK);
 		virtual void draw_point(const point2d& p, color_t c = Colors::BLACK);

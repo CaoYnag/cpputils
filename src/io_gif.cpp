@@ -4,20 +4,20 @@ using namespace std;
 
 namespace spes::image::io
 {
-	std::vector<image_t> read_gif(FILE*)
+	std::vector<shared_ptr<image_t>> read_gif(FILE*)
 	{
 		// TODO not implemented now
 		return {};
 	}
 
-	void write_gif(std::vector<image_t>& ims, FILE* fp, u32 delay)
+	void write_gif(std::vector<shared_ptr<image_t>>& ims, FILE* fp, u32 delay)
 	{
 		if (ims.size() <= 0) return;
 		GifWriter g;
 		const char* tmpfs_path = "/dev/shm/gifw_cache";
-		GifBegin(&g, tmpfs_path, ims[0].width(), ims[0].height(), delay);
+		GifBegin(&g, tmpfs_path, ims[0]->width(), ims[0]->height(), delay);
 		for (auto& im : ims)
-			GifWriteFrame(&g, (u8*)im.buffer(), im.width(), im.height(), delay);
+			GifWriteFrame(&g, (u8*)im->buffer(), im->width(), im->height(), delay);
 		GifEnd(&g);
 		FILE* cache = fopen(tmpfs_path, "rb");
 		if(!cache) return; // open failed.

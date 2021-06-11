@@ -57,7 +57,7 @@ int main( int argc, char *argv[])
     {
         gdk_threads_enter();
         GtkImageViewer viewer1;
-        viewer1.init("wnd1", yuutsu);
+        viewer1.init("wnd1", *yuutsu);
         viewer1.show();
         gdk_threads_leave();
     }).detach();
@@ -66,7 +66,7 @@ int main( int argc, char *argv[])
            {
                gdk_threads_enter();
                GtkImageViewer viewer2;
-               viewer2.init("wnd2", shit);
+               viewer2.init("wnd2", *shit);
                viewer2.show();
                gdk_threads_leave();
            }).detach();

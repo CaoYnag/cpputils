@@ -58,10 +58,10 @@ void gamma(image_t& img)
 void test(const char* src)
 {
     auto ori = image_io::read(src);
-    image_t hist(ori);
-    histogram(hist);
-    image_t gm(ori);
-    gamma(gm);
+    auto hist = make_shared<image_t>(ori);
+    histogram(*hist);
+    auto gm = make_shared<image_t>(ori);
+    gamma(*gm);
 
     image_io::show_image(ori);
     image_io::show_image(hist);

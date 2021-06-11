@@ -18,11 +18,11 @@ void test_screen()
 void test_show()
 {
     auto yuutsu = image_io::read("/home/spes/Resource/res/yuutsu.jpg");
-    printf("loaded img %dx%d\n", yuutsu.width(), yuutsu.height());
+    printf("loaded img %dx%d\n", yuutsu->width(), yuutsu->height());
     image_io::show_image(yuutsu, "cat");
 
     auto shit = image_io::read("/home/spes/Resource/res/shit.jpeg");
-    printf("loaded img %dx%d\n", shit.width(), shit.height());
+    printf("loaded img %dx%d\n", shit->width(), shit->height());
     image_io::show_image(shit, "shit");
 }
 

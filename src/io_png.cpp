@@ -9,9 +9,9 @@ namespace spes::image::io
 	{
 		return !png_sig_cmp((png_const_bytep)buff, 0, len);
 	}
-	image_t read_png(FILE* fp)
+	shared_ptr<image_t> read_png(FILE* fp)
 	{
-		image_t im;
+		auto im = make_shared<image_t>();
 		if (!fp)
 		{
 			perror("invalid fp in read_png");
@@ -49,8 +49,8 @@ namespace spes::image::io
 		png_uint_32 w, h;
 		int dep, color_type, interlace_type;
 		png_get_IHDR(png, info, &w, &h, &dep, &color_type, &interlace_type, nullptr, nullptr);
-		im.init(w, h);
-		auto buff = im.buffer();
+		im->init(w, h);
+		auto buff = im->buffer();
 
 		u32 idx = 0;
 		for (u32 y = 0; y < h; ++y)
@@ -69,7 +69,7 @@ namespace spes::image::io
 		png_destroy_read_struct(&png, &info, nullptr);
 		return im;
 	}
-	void write_png(image_t& im, FILE* fp)
+	void write_png(shared_ptr<image_t> im, FILE* fp)
 	{
 		png_structp png;
 		png_infop info;
@@ -104,10 +104,10 @@ namespace spes::image::io
 		}
 		png_init_io(png, fp);
 		png_set_sig_bytes(png, sig);
-		png_set_IHDR(png, info, im.width(), im.height(), 8, PNG_COLOR_TYPE_RGBA, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
-		png_bytepp rps = new png_bytep[im.height()];
-		for (u32 y = 0; y < im.height(); ++y)
-			rps[y] = (png_bytep)(im.buffer() + y * im.width());
+		png_set_IHDR(png, info, im->width(), im->height(), 8, PNG_COLOR_TYPE_RGBA, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
+		png_bytepp rps = new png_bytep[im->height()];
+		for (u32 y = 0; y < im->height(); ++y)
+			rps[y] = (png_bytep)(im->buffer() + y * im->width());
 
 		png_set_rows(png, info, rps);
 		png_write_info(png, info);

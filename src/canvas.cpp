@@ -11,15 +11,15 @@ namespace spes::canvas
 {
 	Canvas::Canvas(u32 w, u32 h, color_t bk) : _im(), _sz({ w + .0f, h + .0f }), _size(w* h), _rc(0, 0, w - 1, h - 1)
 	{
-		_im.init(w, h);
-		_buff = _im.buffer();
+		_im->init(w, h);
+		_buff = _im->buffer();
 		for (u64 i = 0; i < _size; ++i)
 			_buff[i] = bk;
 	}
-	Canvas::Canvas(image_t& im) : _im(im), _sz({ im.width() + .0f, im.height() + .0f }), 
-		_size(im.width() * im.height()), _rc(0, 0, im.width() - 1, im.height() - 1)
+	Canvas::Canvas(shared_ptr<image_t> im) : _im(im), _sz({ im->width() + .0f, im->height() + .0f }),
+		_size(im->width() * im->height()), _rc(0, 0, im->width() - 1, im->height() - 1)
 	{
-		_buff = _im.buffer();
+		_buff = _im->buffer();
 	}
 	Canvas::~Canvas()
 	{

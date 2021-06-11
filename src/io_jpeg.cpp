@@ -30,10 +30,10 @@ namespace spes::image::io
 		(*cinfo->err->output_message) (cinfo);
 		longjmp(myerr->env, 1);
 	}
-	
-	image_t read_jpeg(FILE* fp)
+
+	shared_ptr<image_t> read_jpeg(FILE* fp)
 	{
-		image_t im;
+		auto im = make_shared<image_t>();
 		if(!fp)
 		{
 			fprintf(stderr, "invalid fp in %s", __func__);
@@ -59,7 +59,7 @@ namespace spes::image::io
 		jpeg_stdio_src(&cinfo, fp);
 
 		(void)jpeg_read_header(&cinfo, TRUE);
-		im_buff buff(cinfo.image_width, cinfo.image_height, IMP_FMT_RGB);
+		auto buff = make_shared<im_buff>(cinfo.image_width, cinfo.image_height, IMP_FMT_RGB);
 
 		(void)jpeg_start_decompress(&cinfo);
 		row_stride = cinfo.output_width * cinfo.output_components;
@@ -68,7 +68,7 @@ namespace spes::image::io
 			((j_common_ptr)&cinfo, JPOOL_IMAGE, row_stride, 1);
 
 		while (cinfo.output_scanline < cinfo.output_height) {
-			u8* dst = buff.buff + cinfo.output_scanline * row_stride;
+			u8* dst = buff->buff + cinfo.output_scanline * row_stride;
 			(void)jpeg_read_scanlines(&cinfo, buffer, 1);
 			memcpy(dst, buffer[0], row_stride);
 		}
@@ -79,13 +79,13 @@ namespace spes::image::io
 		return image_transform(buff);
 	}
 
-	void write_jpeg(image_t& im, FILE* fp, int quality)
+	void write_jpeg(shared_ptr<image_t> im, FILE* fp, int quality)
 	{
 		if (!fp) {
 			fprintf(stderr, "error fp in %s", __func__);
 			return;
 		}
-		im_buff buff = image_transform(im, IMP_FMT_RGB);
+		auto buff = image_transform(im, IMP_FMT_RGB);
 
 		jpeg_compress_struct cinfo;
 		struct jpeg_error_mgr jerr;
@@ -98,8 +98,8 @@ namespace spes::image::io
 
 		jpeg_stdio_dest(&cinfo, fp);
 
-		cinfo.image_width = buff.w;
-		cinfo.image_height = buff.h;
+		cinfo.image_width = buff->w;
+		cinfo.image_height = buff->h;
 		cinfo.input_components = 3;
 		cinfo.in_color_space = JCS_RGB;
 
@@ -111,11 +111,11 @@ namespace spes::image::io
 		jpeg_start_compress(&cinfo, TRUE);
 
 
-		row_stride = buff.w * 3;
+		row_stride = buff->w * 3;
 
 		while (cinfo.next_scanline < cinfo.image_height) 
 		{
-			row_pointer[0] = &buff.buff[cinfo.next_scanline * row_stride];
+			row_pointer[0] = &buff->buff[cinfo.next_scanline * row_stride];
 			(void)jpeg_write_scanlines(&cinfo, row_pointer, 1);
 		}
 		jpeg_finish_compress(&cinfo);

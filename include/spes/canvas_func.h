@@ -20,7 +20,7 @@ namespace spes::canvas
 		virtual ~FuncCanvas();
 		
 		void background(color_t);
-		void background(image_t&);
+		void background(shared_ptr<image_t>);
 		void axis(bool draw, color_t c = Colors::BLACK);
 		void color(color_t);
 		void x_range(range2d&);
