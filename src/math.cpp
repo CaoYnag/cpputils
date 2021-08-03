@@ -161,11 +161,9 @@ namespace spes::math
 	}
 
 
-
-
 	polygon2d::polygon2d(const std::vector<vector2d>& pts)
 	{
-	    init(pts);
+		init(pts);
 	}
 	polygon2d::polygon2d(const polygon2d& poly)
 	{
@@ -175,10 +173,13 @@ namespace spes::math
 
 	bool polygon2d::judge_convex(const std::vector<vector2d>& pts)
 	{
+		// TODO complete this later
 		return true;
 	}
 	void polygon2d::compute_nms(const std::vector<vector2d>& pts, std::vector<vector2d>& nms)
-	{}
+	{
+		// TODO complete this later
+	}
 
     void polygon2d::init(const std::vector<vector2d>& pts)
     {

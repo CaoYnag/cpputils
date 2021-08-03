@@ -62,14 +62,14 @@ namespace spes::algo
                     if (s & _b)
                     {
                         float scale = (rc.bottom() - end.y + .0f) / (start.y - end.y);
-                        start.x = (start.x - end.x) * scale + end.x;
-                        start.y = rc.bottom();
+	                    start.x = (start.x - end.x) * scale + end.x;
+	                    start.y = rc.bottom();
                     }
                     if (e & _b)
                     {
                         float scale = (rc.bottom() - start.y + .0f) / (end.y - start.y);
-                        end.x = (end.x - start.x) * scale + start.x;
-                        end.y = rc.bottom();
+	                    end.x = (end.x - start.x) * scale + start.x;
+	                    end.y = rc.bottom();
                     }
                 }break;
                 case 1:
@@ -78,14 +78,14 @@ namespace spes::algo
                     if (s & _b)
                     {
                         float scale = (rc.right() - end.x + .0f) / (start.x - end.x);
-                        start.x = rc.right();
-                        start.y = (start.y - end.y) * scale + end.y;
+	                    start.x = rc.right();
+	                    start.y = (start.y - end.y) * scale + end.y;
                     }
                     if (e & _b)
                     {
                         float scale = (rc.right() - start.x + .0f) / (end.x - start.x);
-                        end.x = rc.right();
-                        end.y = (end.y - start.y) * scale + start.y;
+	                    end.x = rc.right();
+	                    end.y = (end.y - start.y) * scale + start.y;
                     }
                 }break;
                 case 2:
@@ -94,14 +94,14 @@ namespace spes::algo
                     if (s & _b)
                     {
                         float scale = (rc.top() - end.y) / (start.y - end.y);
-                        start.x = (start.x - end.x) * scale + end.x;
-                        start.y = rc.top();
+	                    start.x = (start.x - end.x) * scale + end.x;
+	                    start.y = rc.top();
                     }
                     if (e & _b)
                     {
                         float scale = (rc.top() - start.y) / (end.y - start.y);
-                        end.x = (end.x - start.x) * scale + start.x;
-                        end.y = rc.top();
+	                    end.x = (end.x - start.x) * scale + start.x;
+	                    end.y = rc.top();
                     }
                 }break;
                 case 3:
@@ -110,14 +110,14 @@ namespace spes::algo
                     if (s & _b)
                     {
                         float scale = (rc.left() - end.x) / (start.x - end.x);
-                        start.x = rc.left();
-                        start.y = (start.y - end.y) * scale + end.y;
+	                    start.x = rc.left();
+	                    start.y = (start.y - end.y) * scale + end.y;
                     }
                     if (e & _b)
                     {
                         float scale = (rc.left() - start.x) / (end.x - start.x);
-                        end.x = rc.left();
-                        end.y = (end.y - start.y) * scale + start.y;
+	                    end.x = rc.left();
+	                    end.y = (end.y - start.y) * scale + start.y;
                     }
                 }break;
             }
@@ -502,15 +502,142 @@ namespace spes::algo
             polys.emplace_back(dst_pts);
         return algo::CR_ACCEPTED;
     }
+	struct marked_point
+	{
+    	point2d pt;
+    	u32 stat;
 
-    int sutherland_hodgman(const polygon2d& src, const polygon2d& bnds, vector<polygon2d>& polys)
+    	marked_point(point2d& p, u32 s) : pt(p), stat(s) {}
+	};
+    enum WA_MARKS
     {
-        // TODO to be finished
-        return CR_REFUSED;
+    	WA_EMPTY = 0,
+    	WA_IN = 1,
+    	WA_OUT = 2
+    };
+    void wa_contruct_polys(vector<marked_point>& pts, vector<polygon2d>& rslt)
+    {
+    	// TODO complete this.
     }
+    int weiler_atherton(const polygon2d& src, const rect& rc, vector<polygon2d>& rslt)
+	{
+		auto&& src_poly = src.points();
+		vector<marked_point> pts;
+		int idx = 0;
+		int next = 0;
+		KEY s, e;
+
+		while(idx < src.num())
+		{
+			next = (idx == (src.num() - 1)) ? 0 : idx + 1;
+			point2d sp = src_poly[idx];
+			point2d ep = src_poly[next];
+			point2d rslt;
+			++idx;
+			s = GenKey(sp, rc);
+			e = GenKey(ep, rc);
+
+			// do cohen_sutherland and mark stat
+			if(s == e && !s) // both inside
+			{
+				pts.emplace_back(sp, 0);
+				pts.emplace_back(ep, 0);
+				continue;
+			}
+			// c-s clip
+			for(int i = 0; i < 4; ++i)
+			{
+				u32 mask = i << i;
+				pts.emplace_back(sp, WA_EMPTY);
+				switch (i)
+				{
+					case 0:
+					{
+						//below
+						if (s & mask) // s > bottom, SO into the clip wnd.
+						{
+							float scale = (rc.bottom() - ep.y + .0f) / (sp.y - ep.y);
+							rslt.x = (sp.x - ep.x) * scale + ep.x;
+							rslt.y = rc.bottom();
+							pts.emplace_back(rslt, WA_IN);
+						}
+						if (e & mask)
+						{
+							float scale = (rc.bottom() - sp.y + .0f) / (ep.y - sp.y);
+							rslt.x = (ep.x - sp.x) * scale + sp.x;
+							rslt.y = rc.bottom();
+							pts.emplace_back(rslt, WA_OUT);
+						}
+					}break;
+					case 1:
+					{
+						//right
+						if (s & mask)
+						{
+							float scale = (rc.right() - ep.x + .0f) / (sp.x - ep.x);
+							rslt.x = rc.right();
+							rslt.y = (sp.y - ep.y) * scale + ep.y;
+							pts.emplace_back(rslt, WA_IN);
+						}
+						if (e & mask)
+						{
+							float scale = (rc.right() - sp.x + .0f) / (ep.x - sp.x);
+							rslt.x = rc.right();
+							rslt.y = (ep.y - sp.y) * scale + sp.y;
+							pts.emplace_back(rslt, WA_OUT);
+						}
+					}break;
+					case 2:
+					{
+						//above
+						if (s & mask)
+						{
+							float scale = (rc.top() - ep.y) / (sp.y - ep.y);
+							rslt.x = (sp.x - ep.x) * scale + ep.x;
+							rslt.y = rc.top();
+							pts.emplace_back(rslt, WA_IN);
+						}
+						if (e & mask)
+						{
+							float scale = (rc.top() - sp.y) / (ep.y - sp.y);
+							rslt.x = (ep.x - sp.x) * scale + sp.x;
+							rslt.y = rc.top();
+							pts.emplace_back(rslt, WA_OUT);
+						}
+					}break;
+					case 3:
+					{
+						//left
+						if (s & mask)
+						{
+							float scale = (rc.left() - ep.x) / (sp.x - ep.x);
+							rslt.x = rc.left();
+							rslt.y = (sp.y - ep.y) * scale + ep.y;
+							pts.emplace_back(rslt, WA_IN);
+						}
+						if (e & mask)
+						{
+							float scale = (rc.left() - sp.x) / (ep.x - sp.x);
+							rslt.x = rc.left();
+							rslt.y = (ep.y - sp.y) * scale + sp.y;
+							pts.emplace_back(rslt, WA_OUT);
+						}
+					}break;
+				}
+				// pts.emplace_back(ep, WA_EMPTY); // avoid repeat pts.
+			}
+		}
+		wa_contruct_polys(pts, rslt);
+		return rslt.size() == 0;
+	}
+	int sutherland_hodgman(const polygon2d& src, const polygon2d& bnds, vector<polygon2d>& polys)
+	{
+		// TODO to be finished
+		return CR_REFUSED;
+	}
     int weiler_atherton(const polygon2d& src, const polygon2d& bnds, vector<polygon2d>& polys)
     {
-        // TODO to be finished
-        return CR_REFUSED;
+	    // TODO to be finished
+	    return CR_REFUSED;
     }
 }

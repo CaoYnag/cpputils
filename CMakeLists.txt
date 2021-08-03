@@ -5,6 +5,11 @@ project(cpputils VERSION 1.0.0 LANGUAGES CXX)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 
+option(BUILD_TESTS "build tests and unit_tests" ON)
+option(BUILD_SAMPLES "build some sample program" ON)
+
+set(CMAKE_IGNORE_PATH "${CMAKE_INSTALL_PREFIX}/spes")
+
 include_directories(
 		${PROJECT_SOURCE_DIR}/include
 )
@@ -28,8 +33,14 @@ if(UNIX OR MINGW)
 endif()
 
 add_subdirectory(src)
-add_subdirectory(tests)
-add_subdirectory(prac)
+
+if(BUILD_TESTS)
+	add_subdirectory(tests)
+	add_subdirectory(unit_tests)
+endif()
+if(BUILD_SAMPLES)
+	add_subdirectory(prac)
+endif()
 install(TARGETS utils
 		LIBRARY DESTINATION lib
 		RUNTIME DESTINATION bin)

@@ -164,6 +164,7 @@ namespace spes::math
         void init(const polygon2d&);
 
 		inline u32 num() const { return _num; }
+		inline std::vector<vector2d> points() const { return _pts; }
 		inline rect bbox() const { return rect(0, 0, 0, 0);} // TODO: complete this
 		inline bool is_convex() const { return _convex; }
 		inline bool is_concave() const { return !_convex; }
