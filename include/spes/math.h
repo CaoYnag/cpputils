@@ -1,7 +1,8 @@
 #pragma once
 #include <vector>
-#include <iostream>
 #include <cmath>
+#include <memory>
+#include <ostream>
 #include "type.h"
 using namespace spes;
 
@@ -79,10 +80,11 @@ namespace spes::math
 		};
 	} size2d, point2d, range2d;
 
+	vector2d normalize(const vector2d& v);
 	 vector2d operator+(const vector2d& v1, const vector2d& v2);
 	 vector2d operator-(const vector2d& v);
 	 vector2d operator-(const vector2d& v1, const vector2d& v2);
-	 s32 operator*(const vector2d& v1, const vector2d& v2);
+	 f32 operator*(const vector2d& v1, const vector2d& v2);
 	 vector2d operator*(const vector2d& v, f32 s);
 	 bool operator==(const vector2d& v1, const vector2d& v2);
 	 f32 cross(vector2d& v1, vector2d& v2);
@@ -117,13 +119,17 @@ namespace spes::math
 		void a(const vector2d& p);
 		void b(const vector2d& p);
 
-		/* point on seg */
-		bool contains(const point2d&) const;
 		/* point on line */
-		bool on(const point2d&) const;
+		bool contains(const point2d&) const;
+		/* 0 for intersects, 1 for not intersect, -1 for covered */
+		int intersect(line2d& line, point2d& rslt);
 
 		bool resolv_x(f32 y, f32& x) const;
 		bool resolv_y(f32 x, f32& y) const;
+
+		bool seg_contains(const point2d&) const;
+		/* 0 for intersects, 1 for not intersect, -1 for covered */
+		int seg_intersect(line2d& seg, point2d& rslt);
 	};
 
 	bool operator==(const line2d& v1, const line2d& v2);
@@ -134,6 +140,7 @@ namespace spes::math
 		vector2d _lt, _rb;
 	public:
 		rect(const vector2d& lt, const vector2d& rb);
+		rect(const line2d& line);
 		rect(f32 left, f32 top, f32 right, f32 bottom);
 		virtual ~rect();
 
@@ -143,6 +150,8 @@ namespace spes::math
 		inline f32 right() const { return _rb.x; }
 		inline f32 top() const { return _lt.y; }
 		inline f32 bottom() const { return _rb.y; }
+
+		inline bool contains(const point2d& pts){ return in_range(pts.x, left(), right()) && in_range(pts.y, top(), bottom());}
 	};
 	bool operator==(const rect& rc1, const rect& rc2);
 
@@ -163,11 +172,15 @@ namespace spes::math
         void init(const std::vector<vector2d>& pts);
         void init(const polygon2d&);
 
-		inline u32 num() const { return _num; }
-		inline std::vector<vector2d> points() const { return _pts; }
 		inline rect bbox() const { return rect(0, 0, 0, 0);} // TODO: complete this
 		inline bool is_convex() const { return _convex; }
 		inline bool is_concave() const { return !_convex; }
+
+		// points or edge nums
+		inline u32 num() const { return _num; }
+		inline std::vector<vector2d> points() const { return _pts; }
+		inline std::vector<vector2d> normals() const { return _nms; }
+		std::shared_ptr<line2d> edge(int i) const;
 	public:
 		static bool judge_convex(const std::vector<vector2d>& pts);
 		static void compute_nms(const std::vector<vector2d>& pts, std::vector<vector2d>& nms);

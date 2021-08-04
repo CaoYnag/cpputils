@@ -1,8 +1,15 @@
 #include <spes/math.h>
 using namespace spes;
+using namespace std;
 
 namespace spes::math
 {
+	vector2d normalize(const vector2d& v)
+	{
+		f32 dist = v * v;
+		if(dist == 0) return v;
+		return v * (1 / sqrt(dist));
+	}
 	vector2d operator+(const vector2d& v1, const vector2d& v2)
 	{
 		return { v1.x + v2.x, v1.y + v2.y };
@@ -18,7 +25,7 @@ namespace spes::math
 		return { v1.x - v2.x, v1.y - v2.y };
 	}
 
-	s32 operator*(const vector2d& v1, const vector2d& v2)
+	f32 operator*(const vector2d& v1, const vector2d& v2)
 	{
 		return v1.x * v2.x + v1.y * v2.y;
 	}
@@ -118,7 +125,7 @@ namespace spes::math
 	    f32 k = (pt.y - _a.y) / (pt.x - _a.x);
 	    return k == _k && (in_range(pt.x, _a.x, _b.x) || in_range(pt.x, _b.x, _a.x)) && (in_range(pt.y, _a.y, _b.y) || in_range(pt.y, _b.y, _a.y));
     }
-    bool line2d::on(const point2d& pt) const
+    bool line2d::seg_contains(const point2d& pt) const
     {
         if(horizontal())
             return pt.y == _a.y;
@@ -128,15 +135,44 @@ namespace spes::math
         return k == _k;
     }
 
+	int line2d::intersect(line2d& line, point2d& rslt)
+	{
+		// D = (x1 - x2)(y3 - y4) - (y1 - y2)(x3 - x4)
+		f32 D = (_a.x - _b.x) * (line._a.y - line._b.y) - (_a.y - _b.y) * (line._a.x - line._b.x);
+		if(D == .0f)
+			return 1;
+		f32 P1 = _a.x * _b.y - _b.x * _a.y; // x1y2 - x2y1
+		f32 P2 = line._a.x * line._b.y - line._b.x * line._a.y; // x3y4 - x4y3
+		// X = (x1y2 - x2y1)(x3 - x4) - (x1 - x2)(x3y4 - x4y3)  /  D
+		rslt.x = ((line._a.x - line._b.x) * P1 - (_a.x - _b.x) * P2) / D;
+		// Y = (x1y2 - x2y1)(y3 - y3) - (y1 - y2)(x3y4 - x4y3)  /  D
+		rslt.y = ((line._a.y - line._b.y) * P1 - (_a.y - _b.y) * P2) / D;
+		return 0;
+	}
+	// better implementation.
+	int line2d::seg_intersect(line2d& seg, point2d& rslt)
+	{
+		if(intersect(seg, rslt))
+			return 1; // not intersect.
+		if(!rect(seg).contains(rslt)) return 1;
+		if(!rect(*this).contains(rslt)) return 1;
+		return 0;
+	}
+
 	bool operator==(const line2d& v1, const line2d& v2)
 	{
 		return (v1._a == v2._a && v1._b == v2._b) || (v1._a == v2._b && v1._b == v2._a);
 	}
 
-
-
 	rect::rect(const vector2d& lt, const vector2d& rb) : _lt(lt), _rb(rb)
 	{}
+	rect::rect(const line2d& line)
+	{
+		_lt.x = min(line._a.x, line._b.x);
+		_lt.y = min(line._a.y, line._b.y);
+		_rb.x = max(line._a.x, line._b.x);
+		_rb.y = max(line._a.y, line._b.y);
+	}
 	rect::rect(f32 left, f32 top, f32 right, f32 bottom) : _lt({ left, top }), _rb({ right, bottom })
 	{}
 	rect::~rect() {}
@@ -178,7 +214,42 @@ namespace spes::math
 	}
 	void polygon2d::compute_nms(const std::vector<vector2d>& pts, std::vector<vector2d>& nms)
 	{
-		// TODO complete this later
+		nms.clear();
+		vector2d norm;
+		for(int i = 0; i < pts.size(); ++i)
+		{
+			// cur pt
+			vector2d cp = pts[i];
+			int n = i + 1;
+			if(n == pts.size()) n = 0;
+			int nn = n + 1;
+			if(nn == pts.size()) nn = 0;
+			// next pt
+			vector2d np = pts[n];
+			vector2d nnp = pts[nn];
+
+			// cur vector
+			vector2d cv = np - cp;
+			// next vector
+			vector2d nv = nnp - np;
+
+
+
+			if(cv.x != 0)
+			{
+				norm.y = 1;
+				norm.x = (-cv.y) / cv.x;
+			}
+			else//x and y couldn't be zero at same time
+			{
+				norm.x = 1;
+				norm.y = (-cv.x) / cv.y;
+			}
+
+			if(norm * nv > 0)
+				norm = -norm;
+			nms.push_back(norm);
+		}
 	}
 
     void polygon2d::init(const std::vector<vector2d>& pts)
@@ -195,6 +266,13 @@ namespace spes::math
 	    _convex = o._convex;
 	    _num = o._num;
     }
+	shared_ptr<line2d> polygon2d::edge(int i) const
+	{
+		if(i < 0 || i >= _pts.size()) return nullptr;
+		int n = i + 1;
+		if(n == _pts.size()) n = 0;
+		return make_shared<line2d>(_pts[i], _pts[n]);
+	}
 
 	polygon2d polygons::Hexagon(f32 sz)
 	{
@@ -214,4 +292,5 @@ namespace spes::math
 				{sz_6, sz_2}, {0, sz_4}, {sz_3, sz_4}
 			});
 	}
+
 }
