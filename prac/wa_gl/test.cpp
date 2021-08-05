@@ -1,10 +1,23 @@
-﻿#include <iostream>
+﻿#include <GL/gl.h>
+#include <GL/glu.h>
+#include <GL/glut.h>
+#include <iostream>
+#include <spes/canvas.h>
+#include <spes/imageio.h>
+#include <spes/math.h>
 #include <spes/algo.h>
-#include <spes/utils.h>
-#include <list>
+#include <vector>
+#include <stdexcept>
+#include <cstdlib>
+#include <ctime>
+#include <cmath>
 #include <cassert>
 using namespace std;
+using namespace spes;
+using namespace spes::image;
 using namespace spes::math;
+using namespace spes::image::io;
+using namespace spes::canvas;
 
 enum CutRet
 {
@@ -69,17 +82,17 @@ enum WA_MARKS
 	WA_INT      = 0x30
 };
 const char* marks_ascii[] =
-{
-	"emp",
-	"in ",
-	"out",
+		{
+				"emp",
+				"in ",
+				"out",
 
-	"-----splitter------",
+				"-----splitter------",
 
-	"tar",
-	"wnd",
-	"int"
-};
+				"tar",
+				"wnd",
+				"int"
+		};
 const int MASK = 0xf;
 char* str_mark(int mark)
 {
@@ -92,8 +105,11 @@ template<template<typename> class Container = std::vector>
 void display_marked_pts(Container<marked_point>& pts, const string& text = "marked poly:")
 {
 	cout << text << ":\n";
-	for(auto& pt : pts)
+	for(int i = 0; i < pts.size(); ++i)
+	{
+		auto& pt = pts.at(i);
 		printf("(%.2f, %.2f) %s %.2f %.2f\n", pt.pt.x, pt.pt.y, str_mark(pt.stat), pt.t, pt.w);
+	}
 	printf("\n");
 }
 void wa_contruct_polys(vector<marked_point>& pts, vector<polygon2d>& rslt)
@@ -137,10 +153,10 @@ int weiler_atherton(const polygon2d& target, const polygon2d& window, vector<pol
 	Container<marked_point> wnd;
 	Container<marked_point> ints;
 	// 1. mark all points.
-	 mark_points<Container>(tar, WA_TAR, target.points());
-	 mark_points<Container>(wnd, WA_WND, window.points());
-	 display_marked_pts<Container>(tar, "target");
-	 display_marked_pts<Container>(wnd, "window");
+	mark_points<Container>(tar, WA_TAR, target.points());
+	mark_points<Container>(wnd, WA_WND, window.points());
+	display_marked_pts<Container>(tar, "target");
+	display_marked_pts<Container>(wnd, "window");
 
 	// 2. find out all intersections, and insert into the 2 array.
 	point2d tmp;
@@ -166,7 +182,7 @@ int weiler_atherton(const polygon2d& target, const polygon2d& window, vector<pol
 			ints.emplace_back(tmp, stat, te, we);
 		}
 	}
-	 display_marked_pts<Container>(ints, "intersects");
+	display_marked_pts<Container>(ints, "intersects");
 
 	// 3. insert and rearrange intersected points
 	for(auto& pt : ints)
@@ -181,7 +197,7 @@ int weiler_atherton(const polygon2d& target, const polygon2d& window, vector<pol
 			c = 1 - c;
 			pt.t += c;
 		}
-		tar.insert(++it, pt);
+		tar.insert(it + 1, pt);
 		it = find_if(wnd.begin(), wnd.end(), [&](const marked_point& p){return p.w == pt.w;});
 		{
 			auto v = pt.pt - it->pt;
@@ -189,7 +205,7 @@ int weiler_atherton(const polygon2d& target, const polygon2d& window, vector<pol
 			c = 1 - c;
 			pt.w += c;
 		}
-		wnd.insert(++it, pt);
+		wnd.insert(it + 1, pt);
 	}
 	cout << "inserted:\n";
 	display_marked_pts<Container>(tar, "target");
@@ -266,24 +282,162 @@ int weiler_atherton(const polygon2d& target, const polygon2d& window, vector<pol
 	return rslt.size() == 0;
 }
 
-void test()
+#define SCREEN_WIDTH 1200
+#define SCREEN_HEIGHT 800
+
+int wa_state = 0;
+vector<point2d> pts;
+shared_ptr<polygon2d> clip_wnd;
+vector<polygon2d> polys;
+vector<polygon2d> clipped;
+
+void init()
 {
-	rect rc (-10, -10, 10, 10);
-	vector<vector2d> wnd_pts = {{-10, -10}, {-10, 10}, {10, 10}, {10, -10}};
-	polygon2d wnd = wnd_pts;
-	vector<vector2d> pts = {{-13, 0}, {0, 13}, {13, 0}, {0, -13}}; // diamond
-	vector<vector2d> rct_ver = {{0, 0}, {0, 20}, {20, 20}, {20, 0}};
-	vector<vector2d> rct_hor = {{-20, -5}, {-20, 5}, {20, 5}, {20, -5}};
+    glClearColor(.0, .0, .0, 0.0); // black background
+    glMatrixMode(GL_PROJECTION);
 
-	polygon2d poly = rct_hor;
-	vector<polygon2d> rslt;
-	weiler_atherton<vector>(poly, wnd, rslt);
+    glLoadIdentity();
+    gluOrtho2D(0.0, (GLdouble)SCREEN_WIDTH, (GLdouble)SCREEN_HEIGHT, 0.0);
+    glViewport(0.0, SCREEN_WIDTH, 0.0, SCREEN_HEIGHT);
 
-	show_polys(rslt);
+
+	//1.开启混合功能
+	glEnable(GL_BLEND);
+
+	//2.指定混合因子
+	//注意:如果你修改了混合方程式,当你使用混合抗锯齿功能时,请一定要改为默认混合方程式
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	//3.开启对点\线\多边形的抗锯齿功能
+	glEnable(GL_POINT_SMOOTH);
+	glEnable(GL_LINE_SMOOTH);
+	glEnable(GL_POLYGON_SMOOTH);
+
+}
+void kb_callback(unsigned char key, int xx, int yy)
+{
+    switch (key)
+    {
+        case 27: exit(0);
+        case 'c':
+        {
+        	// clear all.
+			clip_wnd = nullptr;
+	        wa_state = 0;
+        }
+    	case 'q':
+	    {
+			// do not clear clip wnd
+		    pts.clear();
+		    polys.clear();
+		    clipped.clear();
+	    }break;
+    }
+}
+void mouse_callback(int button, int state, int x, int y)
+{
+    if(state == GLUT_DOWN)
+    {
+        // pick pts of a poly
+        if(button == GLUT_LEFT_BUTTON)
+        {
+            printf("pick (%d, %d)\n", x, y);
+            pts.push_back({x, y});
+        }
+        // end pick pts, construct new poly and clip it
+        if(button == GLUT_RIGHT_BUTTON)
+        {
+            if(pts.size() < 3) return;
+            if(wa_state == 0) // building a clip window
+            {
+	            clip_wnd = make_shared<polygon2d>(pts);
+	            printf("clip window settled with %d pts\n", clip_wnd->num());
+	            wa_state = 1; // change state.
+            }
+            else
+            {
+	            polys.emplace_back(pts);
+	            int sz = clipped.size();
+	            weiler_atherton(polys.back(), *clip_wnd, clipped);
+	            printf("end pick, split into %d polys.\n\n", (clipped.size() - sz));
+            }
+	        pts.clear();
+        }
+    }
+}
+
+void draw_polygon(const polygon2d& poly, bool draw_norm = true)
+{
+	glBegin(GL_LINE_LOOP);
+	for(auto& pt : poly.points())
+			glVertex2d(pt.x, pt.y);
+	glEnd();
+	if(draw_norm)
+	{
+		glBegin(GL_LINES);
+		for(int i = 0; i < poly.num(); ++i)
+		{
+			auto edge = poly.edge(i);
+			auto nm = poly.normals().at(i);
+			point2d center = edge->clamp(0.5f);
+			auto temp = normalize(nm) * 20;
+			glVertex2d(center.x, center.y);
+			glVertex2d(center.x + temp.x, center.y + temp.y);
+		}
+		glEnd();
+	}
+}
+
+void display()
+{
+    glClear(GL_COLOR_BUFFER_BIT);
+
+	glEnable(GLUT_MULTISAMPLE);
+
+    // draw clip wnd
+    glColor3f(1., 1., 1.);
+    glPointSize(2.0);
+    if(clip_wnd) draw_polygon(*clip_wnd);
+
+    glPointSize(1.0);
+    // draw picking lines
+    glColor3f(.0, 1., .0);
+    glBegin(GL_LINE_STRIP);
+    for(auto& p : pts)
+        glVertex2d(p.x, p.y);
+    glEnd();
+
+    // draw origin polys
+    glColor3f(1., .0, .0);
+    for(auto& poly : polys)
+    {
+	    draw_polygon(poly);
+    }
+
+    // draw clipped polys
+    glPointSize(2.0);
+    glColor3f(1., 1., .0);
+    for(auto& poly : clipped) draw_polygon(poly, false); // do not draw norms for clipped poly.
+
+    glFlush();
+
+	glDisable(GLUT_MULTISAMPLE);
 }
 
 int main(int argc, char* argv[])
 {
-	test();
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB | GLUT_MULTISAMPLE);
+    glutInitWindowSize(SCREEN_WIDTH, SCREEN_HEIGHT);
+    glutInitWindowPosition(0, 0);
+    glutCreateWindow("Weiler Atherton GL Sample");
+    glutDisplayFunc(display);
+    glutIdleFunc(display);
+    glutMouseFunc(mouse_callback);
+    glutKeyboardFunc(kb_callback);
+
+    init();
+    glutMainLoop();
+
     return 0;
 }

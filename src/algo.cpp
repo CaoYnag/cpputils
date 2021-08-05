@@ -1,5 +1,6 @@
 #include <spes/algo.h>
 #include <vector>
+#include <cassert>
 using namespace std;
 using namespace spes::math;
 
@@ -502,142 +503,184 @@ namespace spes::algo
             polys.emplace_back(dst_pts);
         return algo::CR_ACCEPTED;
     }
-	struct marked_point
-	{
-    	point2d pt;
-    	u32 stat;
 
-    	marked_point(point2d& p, u32 s) : pt(p), stat(s) {}
-	};
-    enum WA_MARKS
-    {
-    	WA_EMPTY = 0,
-    	WA_IN = 1,
-    	WA_OUT = 2
-    };
-    void wa_contruct_polys(vector<marked_point>& pts, vector<polygon2d>& rslt)
-    {
-    	// TODO complete this.
-    }
-    int weiler_atherton(const polygon2d& src, const rect& rc, vector<polygon2d>& rslt)
-	{
-		auto&& src_poly = src.points();
-		vector<marked_point> pts;
-		int idx = 0;
-		int next = 0;
-		KEY s, e;
-
-		while(idx < src.num())
-		{
-			next = (idx == (src.num() - 1)) ? 0 : idx + 1;
-			point2d sp = src_poly[idx];
-			point2d ep = src_poly[next];
-			point2d rslt;
-			++idx;
-			s = GenKey(sp, rc);
-			e = GenKey(ep, rc);
-
-			// do cohen_sutherland and mark stat
-			if(s == e && !s) // both inside
-			{
-				pts.emplace_back(sp, 0);
-				pts.emplace_back(ep, 0);
-				continue;
-			}
-			// c-s clip
-			for(int i = 0; i < 4; ++i)
-			{
-				u32 mask = i << i;
-				pts.emplace_back(sp, WA_EMPTY);
-				switch (i)
-				{
-					case 0:
-					{
-						//below
-						if (s & mask) // s > bottom, SO into the clip wnd.
-						{
-							float scale = (rc.bottom() - ep.y + .0f) / (sp.y - ep.y);
-							rslt.x = (sp.x - ep.x) * scale + ep.x;
-							rslt.y = rc.bottom();
-							pts.emplace_back(rslt, WA_IN);
-						}
-						if (e & mask)
-						{
-							float scale = (rc.bottom() - sp.y + .0f) / (ep.y - sp.y);
-							rslt.x = (ep.x - sp.x) * scale + sp.x;
-							rslt.y = rc.bottom();
-							pts.emplace_back(rslt, WA_OUT);
-						}
-					}break;
-					case 1:
-					{
-						//right
-						if (s & mask)
-						{
-							float scale = (rc.right() - ep.x + .0f) / (sp.x - ep.x);
-							rslt.x = rc.right();
-							rslt.y = (sp.y - ep.y) * scale + ep.y;
-							pts.emplace_back(rslt, WA_IN);
-						}
-						if (e & mask)
-						{
-							float scale = (rc.right() - sp.x + .0f) / (ep.x - sp.x);
-							rslt.x = rc.right();
-							rslt.y = (ep.y - sp.y) * scale + sp.y;
-							pts.emplace_back(rslt, WA_OUT);
-						}
-					}break;
-					case 2:
-					{
-						//above
-						if (s & mask)
-						{
-							float scale = (rc.top() - ep.y) / (sp.y - ep.y);
-							rslt.x = (sp.x - ep.x) * scale + ep.x;
-							rslt.y = rc.top();
-							pts.emplace_back(rslt, WA_IN);
-						}
-						if (e & mask)
-						{
-							float scale = (rc.top() - sp.y) / (ep.y - sp.y);
-							rslt.x = (ep.x - sp.x) * scale + sp.x;
-							rslt.y = rc.top();
-							pts.emplace_back(rslt, WA_OUT);
-						}
-					}break;
-					case 3:
-					{
-						//left
-						if (s & mask)
-						{
-							float scale = (rc.left() - ep.x) / (sp.x - ep.x);
-							rslt.x = rc.left();
-							rslt.y = (sp.y - ep.y) * scale + ep.y;
-							pts.emplace_back(rslt, WA_IN);
-						}
-						if (e & mask)
-						{
-							float scale = (rc.left() - sp.x) / (ep.x - sp.x);
-							rslt.x = rc.left();
-							rslt.y = (ep.y - sp.y) * scale + sp.y;
-							pts.emplace_back(rslt, WA_OUT);
-						}
-					}break;
-				}
-				// pts.emplace_back(ep, WA_EMPTY); // avoid repeat pts.
-			}
-		}
-		wa_contruct_polys(pts, rslt);
-		return rslt.size() == 0;
-	}
 	int sutherland_hodgman(const polygon2d& src, const polygon2d& bnds, vector<polygon2d>& polys)
 	{
 		// TODO to be finished
 		return CR_REFUSED;
 	}
-    int weiler_atherton(const polygon2d& src, const polygon2d& bnds, vector<polygon2d>& polys)
-    {
-	    // TODO to be finished
-	    return CR_REFUSED;
-    }
+
+	struct marked_point
+	{
+		point2d pt;
+		u32 stat;
+		f32 t;
+		f32 w;
+
+		marked_point(const point2d& p, u32 s) : pt(p), stat(s), t(-1), w(-1) {}
+		marked_point(const point2d& p, u32 s, f32 tt, f32 ww) : pt(p), stat(s), t(tt), w(ww) {}
+	};
+	enum WA_MARKS
+	{
+		WA_EMPTY    = 0,
+		WA_IN       = 1,
+		WA_OUT      = 2,
+
+		WA_TAR      = 0x10,
+		WA_WND      = 0x20,
+		WA_INT      = 0x30
+	};
+	const char* marks_ascii[] =
+	{
+			"emp",
+			"in ",
+			"out",
+
+			"-----splitter------",
+
+			"tar",
+			"wnd",
+			"int"
+	};
+	const int MASK = 0xf;
+	char* str_mark(int mark)
+	{
+		static char buff[2048];
+		sprintf(buff, "%s | %s", marks_ascii[mark & MASK], marks_ascii[3 + (mark >> 4)]);
+		return buff;
+	}
+
+	void mark_points(vector<marked_point>& pts, int stat, const vector<point2d>& src)
+	{
+		int t = -1, w = -1;
+		for(int i = 0; i < src.size(); ++i)
+		{
+			if(stat == WA_TAR) t = i;
+			if(stat == WA_WND) w = i;
+			pts.emplace_back(src[i], stat, t, w);
+		}
+	}
+
+	int weiler_atherton(const polygon2d& target, const polygon2d& window, vector<polygon2d>& rslt)
+	{
+		vector<marked_point> tar;
+		vector<marked_point> wnd;
+		vector<marked_point> ints;
+		// 1. mark all points.
+		mark_points(tar, WA_TAR, target.points());
+		mark_points(wnd, WA_WND, window.points());
+
+		// 2. find out all intersections, and insert into the 2 array.
+		point2d tmp;
+		for(int we = 0; we < window.num(); ++we)
+		{
+			auto wnd_edge = window.edge(we);
+//		wnd.emplace_back(wnd_edge->_a, WA_WND);
+			for(int te = 0; te < target.num(); ++te)
+			{
+				auto tar_edge = target.edge(te);
+//			tar.empplace_back(tar_edge->_a, WA_TAR);
+				if(wnd_edge->seg_intersect(*tar_edge, tmp))
+				{
+					// printf("(%.2f, %.2f) not on edge w %d and t %d.\n", tmp.x, tmp.y, we, te);
+					continue;
+				}
+
+				// find out in or out
+				int stat = WA_INT;
+				int v = (tmp - tar_edge->_a) * window.normals().at(we);
+				if(v > 0) stat |= WA_OUT; // all normals goes out, so if the dot result is bigger than 0, so this line goes out.
+				else stat |= WA_IN;
+				ints.emplace_back(tmp, stat, te, we);
+			}
+		}
+		// 3. insert and rearrange intersected points
+		for(auto& pt : ints)
+		{
+			auto it = find_if(tar.begin(), tar.end(), [&](const marked_point& p){return p.t == pt.t;});
+			{
+				// 'it' must be edge of tar
+				// so compute dist(pt, it), set pt.t += 1 / (1 + dist)
+				// do same tricks in wnd insert.
+				auto v = pt.pt - it->pt;
+				f32 c = 1 / (v * v + 1); // this always less than 1
+				c = 1 - c;
+				pt.t += c;
+			}
+			tar.insert(++it, pt);
+			it = find_if(wnd.begin(), wnd.end(), [&](const marked_point& p){return p.w == pt.w;});
+			{
+				auto v = pt.pt - it->pt;
+				f32 c = 1 / (v * v + 1);
+				c = 1 - c;
+				pt.w += c;
+			}
+			wnd.insert(++it, pt);
+		}
+		sort(tar.begin(), tar.end(), [](const marked_point& p1, const marked_point& p2){return p2.t > p1.t;});
+		sort(wnd.begin(), wnd.end(), [](const marked_point& p1, const marked_point& p2){return p2.w > p1.w;});
+
+		// 4. construct polygons.
+		// 1) find an `in` pt from tar and record it `S`
+		// 2) unmark `in` pt, add pts one by one to output from tar
+		// 3) if meet an `out` pt, turn to wnd, found out position of this `out` pt.
+		// 4) add pts to output from wnd
+		// 5) then must meet an `in` pt, if this pt is `S`, finish a polygon, and back to step 1).
+		//      otherwise, just back to step 2.
+		// TODO how do we identify points has same position?
+		vector<vector2d> poly;
+		decltype(tar.begin()) S;
+		while(true)
+		{
+			auto it = find_if(tar.begin(), tar.end(), [](const marked_point& pt){return pt.stat & WA_IN;});
+			S = it;
+
+			poly_in:
+			if(it == tar.end()) // no more `in` pts, done
+				break;
+
+			it->stat &= ~WA_IN; // unmark
+			poly.push_back(it->pt);
+			while(true)
+			{
+				++it;
+				if(it == tar.end()) it = tar.begin();
+
+				assert(it != S && "fatal error, no match out point for a in point.");
+
+				poly.push_back(it->pt);
+				if(it->stat & WA_OUT) // meet `out` point.
+					break;
+			}
+			// find the `out` pt in wnd
+			it = find_if(wnd.begin(), wnd.end(), [&](const marked_point& pt){ return pt.pt == it->pt; });
+
+			assert(it != wnd.end() && "no match out point in wnd.");
+
+			while(true)
+			{
+				++it;
+				if(it == wnd.end()) it = wnd.begin();
+				if(it->stat & WA_IN)
+				{
+					if(it->pt == S->pt) // meet start.
+					{
+						rslt.emplace_back(poly);
+						poly.clear();
+						break; // a new round.
+					}
+					else
+					{
+						// need unmark `in` in wnd pt?
+						it = find_if(tar.begin(), tar.end(), [&](const marked_point& pt){ return pt.pt == it->pt; });
+						goto poly_in;
+					}
+				}
+				else poly.push_back(it->pt);
+			}
+		}
+
+		return rslt.size() == 0;
+	}
+
 }

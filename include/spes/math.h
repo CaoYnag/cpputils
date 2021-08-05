@@ -130,6 +130,8 @@ namespace spes::math
 		bool seg_contains(const point2d&) const;
 		/* 0 for intersects, 1 for not intersect, -1 for covered */
 		int seg_intersect(line2d& seg, point2d& rslt);
+
+		inline vector2d clamp(f32 s) { return _a + (_b - _a) * s; }
 	};
 
 	bool operator==(const line2d& v1, const line2d& v2);
