@@ -300,214 +300,402 @@ namespace spes::algo
             }
         }
     }
-    int sutherland_hodgman(const polygon2d& src, const rect& bnds, vector<polygon2d>& polys)
+
+	shared_ptr<polygon2d> sutherland_hodgman(const spes::math::polygon2d& src, const spes::math::rect& bnds)
     {
-        vector<vector<vector2d>> srcs;
-        srcs.emplace_back(src._pts);
-        vector<vector<vector2d>> dsts;
+    	vector<vector2d> src_pts;
+    	src_pts.assign(src._pts.begin(), src._pts.end());
         vector<vector2d> pts;
-        vector<vector2d> tmp;
-        vector<int> recs;
-        vector<vector<int>> idxs;
 
         bool flag = false;
         int s = 0, e = 0;
 
         // clip with left edge
-        flag = false;
-        for(auto& src_pts : srcs)
-        {
-            int ins = 0;
-            tmp.clear();
-            pts.clear();
-            recs.clear();
-            idxs.clear();
-            for(int i = 0; i < src_pts.size(); ++i)
-            {
-                auto& c = src_pts[i];
-                auto& n = (i == (src_pts.size() - 1)) ? src_pts[0] : src_pts[i + 1];
-                s = c.x > bnds.left();
-                e = n.x > bnds.left();
+        src_pts.swap(pts);
+	    pts.clear();
+	    for(int i = 0; i < src_pts.size(); ++i)
+	    {
+		    auto& c = src_pts[i];
+		    auto& n = (i == (src_pts.size() - 1)) ? src_pts[0] : src_pts[i + 1];
+		    s = c.x > bnds.left();
+		    e = n.x > bnds.left();
 
-                int r = s + e;
-                if(r == 0); // both outside
-                else if(r == 2) // both inside
-                {
-                    pts.push_back(n);
-                    recs.push_back(ins);
-                }
-                else if(s == 1) // goes out clip window
-                {
-                    f32 v;
-                    line2d(c, n).resolv_y(bnds.left(), v);
-                    pts.push_back({bnds.left(), v});
-                    recs.push_back(ins | SH_OUT_MASK);
-                    ++ins;
-                }
-                else if(e == 1) // goes in clip window
-                {
-                    f32 v;
-                    line2d(c, n).resolv_y(bnds.left(), v);
-                    pts.push_back({bnds.left(), v});
-                    recs.push_back(ins | SH_IN_MASK);
-                    pts.push_back(n);
-                    recs.push_back(ins);
-                }
-            }
-            resolv_independent_ee(pts, recs, AXIS_Y, idxs);
-            split_polygon(pts, idxs, dsts);
-        }
+		    int r = s + e;
+		    if(r == 0); // both outside
+		    else if(r == 2) // both inside
+			    pts.push_back(n);
+		    else if(s == 1) // goes out clip window
+		    {
+			    f32 v;
+			    line2d(c, n).resolv_y(bnds.left(), v);
+			    pts.push_back({bnds.left(), v});
+		    }
+		    else if(e == 1) // goes in clip window
+		    {
+			    f32 v;
+			    line2d(c, n).resolv_y(bnds.left(), v);
+			    pts.push_back({bnds.left(), v});
+			    pts.push_back(n);
+		    }
+	    }
 
         // clip with right edge
-        flag = false;
-        srcs.clear();
-        srcs.swap(dsts);
-        for(auto& src_pts : srcs)
-        {
-            int ins = 0;
-            tmp.clear();
-            pts.clear();
-            idxs.clear();
-            recs.clear();
-            for(int i = 0; i < src_pts.size(); ++i)
-            {
-                auto& c = src_pts[i];
-                auto& n = (i == (src_pts.size() - 1)) ? src_pts[0] : src_pts[i + 1];
-                s = c.x < bnds.right();
-                e = n.x < bnds.right();
+	    src_pts.swap(pts);
+	    pts.clear();
+	    for(int i = 0; i < src_pts.size(); ++i)
+	    {
+		    auto& c = src_pts[i];
+		    auto& n = (i == (src_pts.size() - 1)) ? src_pts[0] : src_pts[i + 1];
+		    s = c.x < bnds.right();
+		    e = n.x < bnds.right();
 
-                int r = s + e;
-                if(r == 0); // both outside
-                else if(r == 2) // both inside
-                {
-                    pts.push_back(n);
-                    recs.push_back(ins);
-                }
-                else if(s == 1) // goes out clip window
-                {
-                    f32 v;
-                    line2d(c, n).resolv_y(bnds.right(), v);
-                    pts.push_back({bnds.right(), v});
-                    recs.push_back(ins | SH_OUT_MASK);
-                    ++ins;
-                }
-                else if(e == 1) // goes in clip window
-                {
-                    f32 v;
-                    line2d(c, n).resolv_y(bnds.right(), v);
-                    pts.push_back({bnds.right(), v});
-                    recs.push_back(ins | SH_IN_MASK);
-                    pts.push_back(n);
-                    recs.push_back(ins);
-                }
-            }
-            resolv_independent_ee(pts, recs, AXIS_Y, idxs);
-            split_polygon(pts, idxs, dsts);
-        }
+		    int r = s + e;
+		    if(r == 0); // both outside
+		    else if(r == 2) // both inside
+			    pts.push_back(n);
+		    else if(s == 1) // goes out clip window
+		    {
+			    f32 v;
+			    line2d(c, n).resolv_y(bnds.right(), v);
+			    pts.push_back({bnds.right(), v});
+		    }
+		    else if(e == 1) // goes in clip window
+		    {
+			    f32 v;
+			    line2d(c, n).resolv_y(bnds.right(), v);
+			    pts.push_back({bnds.right(), v});
+			    pts.push_back(n);
+		    }
+	    }
 
         // clip with top edge
-        flag = false;
-        srcs.clear();
-        srcs.swap(dsts);
-        for(auto& src_pts : srcs)
-        {
-            int ins = 0;
-            tmp.clear();
-            pts.clear();
-            recs.clear();
-            idxs.clear();
-            for(int i = 0; i < src_pts.size(); ++i)
-            {
-                auto& c = src_pts[i];
-                auto& n = (i == (src_pts.size() - 1)) ? src_pts[0] : src_pts[i + 1];
-                s = c.y > bnds.top();
-                e = n.y > bnds.top();
+	    src_pts.swap(pts);
+	    pts.clear();
+	    for(int i = 0; i < src_pts.size(); ++i)
+	    {
+		    auto& c = src_pts[i];
+		    auto& n = (i == (src_pts.size() - 1)) ? src_pts[0] : src_pts[i + 1];
+		    s = c.y > bnds.top();
+		    e = n.y > bnds.top();
 
-                int r = s + e;
-                if(r == 0); // both outside
-                else if(r == 2) // both inside
-                {
-                    pts.push_back(n);
-                    recs.push_back(ins);
-                }
-                else if(s == 1) // goes out clip window
-                {
-                    f32 x;
-                    line2d(c, n).resolv_x(bnds.top(), x);
-                    pts.push_back({x, bnds.top()});
-                    recs.push_back(ins | SH_OUT_MASK);
-                    ++ins;
-                }
-                else if(e == 1) // goes in clip window
-                {
-                    f32 x;
-                    line2d(c, n).resolv_x(bnds.top(), x);
-                    pts.push_back({x, bnds.top()});
-                    recs.push_back(ins | SH_IN_MASK);
-                    pts.push_back(n);
-                    recs.push_back(ins);
-                }
-            }
-            resolv_independent_ee(pts, recs, AXIS_X, idxs);
-            split_polygon(pts, idxs, dsts);
-        }
+		    int r = s + e;
+		    if(r == 0); // both outside
+		    else if(r == 2) // both inside
+		    {
+			    pts.push_back(n);
+		    }
+		    else if(s == 1) // goes out clip window
+		    {
+			    f32 x;
+			    line2d(c, n).resolv_x(bnds.top(), x);
+			    pts.push_back({x, bnds.top()});
+		    }
+		    else if(e == 1) // goes in clip window
+		    {
+			    f32 x;
+			    line2d(c, n).resolv_x(bnds.top(), x);
+			    pts.push_back({x, bnds.top()});
+			    pts.push_back(n);
+		    }
+	    }
 
         // clip with bottom edge
-        flag = false;
-        srcs.clear();
-        srcs.swap(dsts);
-        for(auto& src_pts : srcs)
-        {
-            int ins = 0;
-            tmp.clear();
-            pts.clear();
-            recs.clear();
-            idxs.clear();
-            for(int i = 0; i < src_pts.size(); ++i)
-            {
-                auto& c = src_pts[i];
-                auto& n = (i == (src_pts.size() - 1)) ? src_pts[0] : src_pts[i + 1];
-                s = c.y < bnds.bottom();
-                e = n.y < bnds.bottom();
+	    src_pts.swap(pts);
+	    pts.clear();
+	    for(int i = 0; i < src_pts.size(); ++i)
+	    {
+		    auto& c = src_pts[i];
+		    auto& n = (i == (src_pts.size() - 1)) ? src_pts[0] : src_pts[i + 1];
+		    s = c.y < bnds.bottom();
+		    e = n.y < bnds.bottom();
 
-                int r = s + e;
-                if(r == 0); // both outside
-                else if(r == 2) // both inside
-                {
-                    pts.push_back(n);
-                    recs.push_back(ins);
-                }
-                else if(s == 1) // goes out clip window
-                {
-                    f32 v;
-                    line2d(c, n).resolv_x(bnds.bottom(), v);
-                    pts.push_back({v, bnds.bottom()});
-                    recs.push_back(ins | SH_OUT_MASK);
-                    ++ins;
-                }
-                else if(e == 1) // goes in clip window
-                {
-                    f32 v;
-                    line2d(c, n).resolv_x(bnds.bottom(), v);
-                    pts.push_back({v, bnds.bottom()});
-                    recs.push_back(ins | SH_IN_MASK);
-                    pts.push_back(n);
-                    recs.push_back(ins);
-                }
-            }
-            resolv_independent_ee(pts, recs, AXIS_X, idxs);
-            split_polygon(pts, idxs, dsts);
-        }
+		    int r = s + e;
+		    if(r == 0); // both outside
+		    else if(r == 2) // both inside
+		    {
+			    pts.push_back(n);
+		    }
+		    else if(s == 1) // goes out clip window
+		    {
+			    f32 v;
+			    line2d(c, n).resolv_x(bnds.bottom(), v);
+			    pts.push_back({v, bnds.bottom()});
+		    }
+		    else if(e == 1) // goes in clip window
+		    {
+			    f32 v;
+			    line2d(c, n).resolv_x(bnds.bottom(), v);
+			    pts.push_back({v, bnds.bottom()});
+			    pts.push_back(n);
+		    }
+	    }
 
-        for(auto& dst_pts : dsts)
-            polys.emplace_back(dst_pts);
-        return algo::CR_ACCEPTED;
+        return make_shared<polygon2d>(pts);
     }
-
-	int sutherland_hodgman(const polygon2d& src, const polygon2d& bnds, vector<polygon2d>& polys)
+	int sutherland_hodgman(const polygon2d& src, const rect& bnds, vector<polygon2d>& polys)
 	{
-		// TODO to be finished
-		return CR_REFUSED;
+		vector<vector<vector2d>> srcs;
+		srcs.emplace_back(src._pts);
+		vector<vector<vector2d>> dsts;
+		vector<vector2d> pts;
+		vector<vector2d> tmp;
+		vector<int> recs;
+		vector<vector<int>> idxs;
+
+		bool flag = false;
+		int s = 0, e = 0;
+
+		// clip with left edge
+		flag = false;
+		for(auto& src_pts : srcs)
+		{
+			int ins = 0;
+			tmp.clear();
+			pts.clear();
+			recs.clear();
+			idxs.clear();
+			for(int i = 0; i < src_pts.size(); ++i)
+			{
+				auto& c = src_pts[i];
+				auto& n = (i == (src_pts.size() - 1)) ? src_pts[0] : src_pts[i + 1];
+				s = c.x > bnds.left();
+				e = n.x > bnds.left();
+
+				int r = s + e;
+				if(r == 0); // both outside
+				else if(r == 2) // both inside
+				{
+					pts.push_back(n);
+					recs.push_back(ins);
+				}
+				else if(s == 1) // goes out clip window
+				{
+					f32 v;
+					line2d(c, n).resolv_y(bnds.left(), v);
+					pts.push_back({bnds.left(), v});
+					recs.push_back(ins | SH_OUT_MASK);
+					++ins;
+				}
+				else if(e == 1) // goes in clip window
+				{
+					f32 v;
+					line2d(c, n).resolv_y(bnds.left(), v);
+					pts.push_back({bnds.left(), v});
+					recs.push_back(ins | SH_IN_MASK);
+					pts.push_back(n);
+					recs.push_back(ins);
+				}
+			}
+			resolv_independent_ee(pts, recs, AXIS_Y, idxs);
+			split_polygon(pts, idxs, dsts);
+		}
+
+		// clip with right edge
+		flag = false;
+		srcs.clear();
+		srcs.swap(dsts);
+		for(auto& src_pts : srcs)
+		{
+			int ins = 0;
+			tmp.clear();
+			pts.clear();
+			idxs.clear();
+			recs.clear();
+			for(int i = 0; i < src_pts.size(); ++i)
+			{
+				auto& c = src_pts[i];
+				auto& n = (i == (src_pts.size() - 1)) ? src_pts[0] : src_pts[i + 1];
+				s = c.x < bnds.right();
+				e = n.x < bnds.right();
+
+				int r = s + e;
+				if(r == 0); // both outside
+				else if(r == 2) // both inside
+				{
+					pts.push_back(n);
+					recs.push_back(ins);
+				}
+				else if(s == 1) // goes out clip window
+				{
+					f32 v;
+					line2d(c, n).resolv_y(bnds.right(), v);
+					pts.push_back({bnds.right(), v});
+					recs.push_back(ins | SH_OUT_MASK);
+					++ins;
+				}
+				else if(e == 1) // goes in clip window
+				{
+					f32 v;
+					line2d(c, n).resolv_y(bnds.right(), v);
+					pts.push_back({bnds.right(), v});
+					recs.push_back(ins | SH_IN_MASK);
+					pts.push_back(n);
+					recs.push_back(ins);
+				}
+			}
+			resolv_independent_ee(pts, recs, AXIS_Y, idxs);
+			split_polygon(pts, idxs, dsts);
+		}
+
+		// clip with top edge
+		flag = false;
+		srcs.clear();
+		srcs.swap(dsts);
+		for(auto& src_pts : srcs)
+		{
+			int ins = 0;
+			tmp.clear();
+			pts.clear();
+			recs.clear();
+			idxs.clear();
+			for(int i = 0; i < src_pts.size(); ++i)
+			{
+				auto& c = src_pts[i];
+				auto& n = (i == (src_pts.size() - 1)) ? src_pts[0] : src_pts[i + 1];
+				s = c.y > bnds.top();
+				e = n.y > bnds.top();
+
+				int r = s + e;
+				if(r == 0); // both outside
+				else if(r == 2) // both inside
+				{
+					pts.push_back(n);
+					recs.push_back(ins);
+				}
+				else if(s == 1) // goes out clip window
+				{
+					f32 x;
+					line2d(c, n).resolv_x(bnds.top(), x);
+					pts.push_back({x, bnds.top()});
+					recs.push_back(ins | SH_OUT_MASK);
+					++ins;
+				}
+				else if(e == 1) // goes in clip window
+				{
+					f32 x;
+					line2d(c, n).resolv_x(bnds.top(), x);
+					pts.push_back({x, bnds.top()});
+					recs.push_back(ins | SH_IN_MASK);
+					pts.push_back(n);
+					recs.push_back(ins);
+				}
+			}
+			resolv_independent_ee(pts, recs, AXIS_X, idxs);
+			split_polygon(pts, idxs, dsts);
+		}
+
+		// clip with bottom edge
+		flag = false;
+		srcs.clear();
+		srcs.swap(dsts);
+		for(auto& src_pts : srcs)
+		{
+			int ins = 0;
+			tmp.clear();
+			pts.clear();
+			recs.clear();
+			idxs.clear();
+			for(int i = 0; i < src_pts.size(); ++i)
+			{
+				auto& c = src_pts[i];
+				auto& n = (i == (src_pts.size() - 1)) ? src_pts[0] : src_pts[i + 1];
+				s = c.y < bnds.bottom();
+				e = n.y < bnds.bottom();
+
+				int r = s + e;
+				if(r == 0); // both outside
+				else if(r == 2) // both inside
+				{
+					pts.push_back(n);
+					recs.push_back(ins);
+				}
+				else if(s == 1) // goes out clip window
+				{
+					f32 v;
+					line2d(c, n).resolv_x(bnds.bottom(), v);
+					pts.push_back({v, bnds.bottom()});
+					recs.push_back(ins | SH_OUT_MASK);
+					++ins;
+				}
+				else if(e == 1) // goes in clip window
+				{
+					f32 v;
+					line2d(c, n).resolv_x(bnds.bottom(), v);
+					pts.push_back({v, bnds.bottom()});
+					recs.push_back(ins | SH_IN_MASK);
+					pts.push_back(n);
+					recs.push_back(ins);
+				}
+			}
+			resolv_independent_ee(pts, recs, AXIS_X, idxs);
+			split_polygon(pts, idxs, dsts);
+		}
+
+		for(auto& dst_pts : dsts)
+			polys.emplace_back(dst_pts);
+		return algo::CR_ACCEPTED;
+	}
+
+	shared_ptr<polygon2d> sutherland_hodgman(const polygon2d& src, const polygon2d& bnds)
+	{
+        vector<point2d> src_pts(src.points());
+        vector<point2d> tmp;
+
+		auto nms = bnds.normals();
+		int state = 0;
+		point2d I;
+        for(int e = 0; e < bnds.num(); ++e)
+        {
+            auto line = bnds.edge(e);
+			auto nm = nms[e];
+
+			
+			for(int i = 0; i < src_pts.size(); ++i)
+			{
+				int n = i + 1;
+				if(n == src_pts.size()) n = 0;
+				auto S = src_pts[i];
+				auto E = src_pts[n];
+
+				// check state
+				state = 0;
+				auto sp = S - line->_a;
+				auto ep = E - line->_b;
+				auto sr = sp * nm;
+				auto er = ep * nm;
+
+				if(sr > 0) state |= 0x1; // outside
+				if(er > 0) state |= 0x2; // outside
+				
+				switch(state)
+				{
+				case 3: break;// both outside
+				case 1: // enter poly.
+				{
+					// add I, E
+					auto e = make_shared<line2d>(S, E);
+					if(!(line->seg_intersect(*e, I)))
+						tmp.push_back(I);
+					tmp.push_back(E);
+				} break;
+				case 2: // leave poly.
+				{
+					// add I
+					auto e = make_shared<line2d>(S, E);
+					if(!(line->seg_intersect(*e, I)))
+						tmp.push_back(I);
+				}break;
+				case 0: // in poly
+					// add E
+					tmp.push_back(E); break;
+				
+				}
+			}
+			tmp.swap(src_pts);
+			tmp.clear();
+		}
+
+		return make_shared<polygon2d>(src_pts);
 	}
 
 	struct marked_point

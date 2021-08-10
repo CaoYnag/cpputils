@@ -71,8 +71,9 @@ namespace spes::algo
     int cohen_sutherland(spes::math::line2d& line, const spes::math::rect& rect);
 
 
-    int sutherland_hodgman(const spes::math::polygon2d& src, const spes::math::rect& bnds, std::vector<spes::math::polygon2d>& rslt);
-    int sutherland_hodgman(const spes::math::polygon2d& src, const spes::math::polygon2d& bnds, std::vector<spes::math::polygon2d>& rslt);
+	std::shared_ptr<spes::math::polygon2d> sutherland_hodgman(const spes::math::polygon2d& src, const spes::math::rect& bnds);
+	int sutherland_hodgman(const spes::math::polygon2d& src, const spes::math::rect& bnds, std::vector<spes::math::polygon2d>& rslt);
+	std::shared_ptr<spes::math::polygon2d> sutherland_hodgman(const spes::math::polygon2d& src, const spes::math::polygon2d& bnds);
 
 	int weiler_atherton(const spes::math::polygon2d& src, const spes::math::polygon2d& bnds, std::vector<spes::math::polygon2d>& rslt);
 }

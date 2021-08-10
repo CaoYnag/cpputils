@@ -14,7 +14,7 @@ include_directories(
 		${PROJECT_SOURCE_DIR}/include
 )
 link_directories(
-		${PROJECT_SOURCE_DIR}/bin
+		${PROJECT_SOURCE_DIR}/bindd
 )
 
 if(WIN32 AND NOT MINGW)
@@ -36,6 +36,7 @@ add_subdirectory(src)
 
 if(BUILD_TESTS)
 	add_subdirectory(tests)
+	add_subdirectory(benchmarks)
 	add_subdirectory(unit_tests)
 endif()
 if(BUILD_SAMPLES)
