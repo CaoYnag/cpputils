@@ -17,7 +17,6 @@ long cur_ms()
 #endif
 }
 
-
 string str_uppercase(const string& s)
 {
 	string ret(s);
@@ -35,4 +34,19 @@ string str_lowercase(const string& s)
 		if(p[i] <= 'Z' && p[i] >= 'A') p[i] |= 0x20;
 
 	return ret;
+}
+
+static uint32_t _smush_seed = 0, _smush_idx = 0;
+uint32_t smush()
+{
+	constexpr const uint32_t m = 0x5bd1e995;
+	uint32_t k = _smush_idx++ * m;
+	_smush_seed = (k ^ (k >> 24) ^ (_smush_seed * m)) * m;
+	return _smush_seed ^ (_smush_seed >> 13);
+}
+
+void smush_seed(uint32_t s)
+{
+	_smush_seed = s;
+	_smush_idx = 0;
 }

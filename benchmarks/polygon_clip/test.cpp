@@ -32,9 +32,12 @@ void bench()
 		cout << b << "\t:" << bench(b, [&](){weiler_atherton(poly, wnd, rslt);rslt.clear();}) << endl;
 
 
-	printf("sh nm\n");
+	printf("sh rc\n");
 	for(int b = 10000; b <= 1000000; b *= 10)
 		cout << b << "\t:" << bench(b, [&](){ sutherland_hodgman(poly, rc); }) << endl;
+	printf("sh nm\n");
+	for(int b = 10000; b <= 1000000; b *= 10)
+		cout << b << "\t:" << bench(b, [&](){ sutherland_hodgman(poly, wnd); }) << endl;
 	printf("sh mdf\n");
 	for(int b = 10000; b <= 1000000; b *= 10)
 		cout << b << "\t:" << bench(b, [&](){ sutherland_hodgman(poly, rc, rslt);rslt.clear();}) << endl;
