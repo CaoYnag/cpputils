@@ -359,7 +359,7 @@ void mouse_callback(int button, int state, int x, int y)
 	            polys.emplace_back(pts);
 	            int sz = clipped.size();
 	            weiler_atherton(polys.back(), *clip_wnd, clipped);
-	            printf("end pick, split into %d polys.\n\n", (clipped.size() - sz));
+	            printf("end pick, split into %ld polys.\n\n", (clipped.size() - sz));
             }
 	        pts.clear();
         }

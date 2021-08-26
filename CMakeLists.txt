@@ -42,7 +42,7 @@ endif()
 if(BUILD_SAMPLES)
 	add_subdirectory(prac)
 endif()
-install(TARGETS utils
+install(TARGETS spes
 		LIBRARY DESTINATION lib
 		RUNTIME DESTINATION bin)
 file(GLOB header_files "${PROJECT_SOURCE_DIR}/include/spes/*.h")

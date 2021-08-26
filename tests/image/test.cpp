@@ -93,7 +93,7 @@ void test2()
 
 void test_hsv()
 {
-    printf("hsv size: %d\n", sizeof(hsv_t));
+    printf("hsv size: %ld\n", sizeof(hsv_t));
     auto shit = image_io::read("/home/spes/Resource/res/yuutsu.jpg");// 165x177
     color_t first = shit->buffer()[0];
     auto hsv = to_hsv(first);

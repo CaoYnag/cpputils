@@ -43,7 +43,7 @@ namespace spes::image::io
 		HGLRC _rc;
 		u32 _tex;
 	public:
-		WindowsImageViewer(const image_t& im, string tt) : ImageViewer(im, tt)
+		WindowsImageViewer(const image_t& im, const string& tt) : ImageViewer(im, tt)
 		{
 		}
 		virtual ~WindowsImageViewer()
@@ -251,7 +251,8 @@ namespace spes::image::io
         GtkWidget* _wnd;
         GtkWidget* _img;
 	public:
-		UnixImageViewer(shared_ptr<image_t> im, string tt) : ImageViewer(im, tt)
+		UnixImageViewer(shared_ptr<image_t> im, const string& tt)
+			: ImageViewer(im, tt), _wnd(nullptr), _img(nullptr)
 		{
 		}
 		virtual ~UnixImageViewer()
