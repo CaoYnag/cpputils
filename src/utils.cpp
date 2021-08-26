@@ -17,6 +17,13 @@ long cur_ms()
 #endif
 }
 
+int my_atoi(const string& s)
+{
+	int i = 0;
+	if(!s.empty()) sscanf(s.c_str(), "%d", &i);
+	return i;
+}
+
 string str_uppercase(const string& s)
 {
 	string ret(s);
