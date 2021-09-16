@@ -13,7 +13,7 @@ using namespace spes::image;
 using namespace spes::image::io;
 using namespace spes::color;
 using namespace std::filesystem;
-using json = nlohmann::json;
+using namespace nlohmann;
 
 struct MapStats
 {
@@ -47,20 +47,86 @@ void coord_trans(int x, int y, double& xx, double& yy, const MapStats& stats)
 }
 
 void load_conf(const string& path, HMConf& conf)
-{}
-void load_data(const string& path, vector<HeatData>& data)
-{}
+{
+	auto sz = file_size(path);
+	char buff[sz];
+	FILE* fp = fopen(path.c_str(), "r");
+	if(!fp)
+		throw runtime_error("cannot open con file.");
+	fread(buff, 1, sz, fp);
+	fclose(fp);
 
-void process_data(String path, const HMConf& conf, vector<HeatData>& data, MapStats& stats)
+	json j = json::parse(string(buff, sz));
+	conf.min_rad = j["min_rad"];
+	conf.max_rad = j["max_rad"];
+	conf.max_heat = j["max_heat"];
+
+	vector<color_t> colors;
+	json cgj = j["color_scheme"];
+	for(json& c : cgj)
+		colors.emplace_back(c["r"], c["g"], c["b"], c["a"]);
+	conf.cg = make_shared<ColorGradient>(colors);
+}
+void load_data(const string& path, vector<HeatData>& data)
+{
+	auto sz = file_size(path);
+	char buff[sz];
+	FILE* fp = fopen(path.c_str(), "r");
+	if(!fp) throw runtime_error("cannot open data file.");
+	fread(buff, 1, sz, fp);
+	fclose(fp);
+
+	json d = json::parse(string(buff, sz));
+	for(json& sd : d)
+	{
+		data.emplace_back(sd["lng"], sd["lat"], sd["count"]);
+	}
+}
+
+void process_data(const string& path, int size, const HMConf& conf, vector<HeatData>& data, MapStats& stats)
 {
 	load_data(path, data);
+	stats.minx = 99999;
+	stats.maxx = -999999;
+	stats.miny = 999999;
+	stats.maxy = -99999;
+	stats.minh = 99999;
+	stats.maxh = -99999;
+	
+	for(auto& d : data)
+	{
+		if(d.x < stats.minx) stats.minx = d.x;
+		if(d.x > stats.maxx) stats.maxx = d.x;
+		if(d.y < stats.miny) stats.miny = d.y;
+		if(d.y > stats.maxy) stats.maxy = d.y;
+
+		if(d.heat < stats.minh) stats.minh = d.heat;
+		if(d.heat > stats.maxh) stats.maxh = d.heat;
+	}
+
+	stats.minx -= conf.max_rad;
+	stats.maxx += conf.max_rad;
+	stats.miny -= conf.max_rad;
+	stats.maxy += conf.max_rad;
+	stats.ww = stats.maxx - stats.minx;
+	stats.hh = stats.maxy - stats.miny;
+	if(stats.ww > stats.hh)
+	{
+		stats.width = size;
+		stats.height = size * stats.hh / stats.ww;
+	}
+	else
+	{
+		stats.height = size;
+		stats.width = size * stats.ww / stats.hh;
+	}
 }
 
 double intensity(double x, double y, const HeatData& data, const HMConf& conf)
 {
-	double dist = sqrt(x * data.x, y * data.y);
+	double dist = sqrt(x * data.x + y * data.y);
 	if(dist >= conf.max_rad) return .0;
-	return data.heat * (max_rad - dist) / max_rad;
+	return data.heat * (conf.max_rad - dist) / conf.max_rad;
 }
 
 double intensity(double x, double y, const vector<HeatData>& data, const HMConf& conf)
@@ -71,7 +137,7 @@ double intensity(double x, double y, const vector<HeatData>& data, const HMConf&
 	return ret;
 }
 
-color_t heat2color(double heat, HMConf& conf)
+color_t heat2color(double heat, const HMConf& conf)
 {
 	// use some func to adjust heat here
 	// like sqrt, square, log
@@ -82,7 +148,8 @@ shared_ptr<image_t> render(const MapStats& stats, const HMConf& conf, const vect
 {
 	int wid = stats.width;
 	int hgt = stats.height;
-	auto im = make_shared<image_t>(wid, hgt);
+	auto im = make_shared<image_t>();
+	im->init(wid, hgt);
 	auto buf = im->buffer();
 	auto sz = wid * hgt;
 	
@@ -103,9 +170,16 @@ void process(const string& src, const string& dst, int size)
 	HMConf conf;
 
 	load_conf("hm.conf", conf);
-	process_data(src, conf, data, stats);
+	process_data(src, size, conf, data, stats);
+	{
+		// do some log here
+		printf("world bnds: (%f %f %f %f)\n", stats.minx, stats.miny, stats.maxx, stats.maxy);
+		printf("heat range: (%f %f)\n", stats.minh, stats.maxh);
+		printf("image size: (%d %d)\n", stats.width, stats.height);
+		printf("conf: rad (%f %f) heat: %f\n", conf.min_rad, conf.max_rad, conf.max_heat);
+	}
 	auto im = render(stats, conf, data);
-	image_io::write(im, dst);
+	image_io::write(im, dst.c_str());
 }
 
 int main(int argc, char** argv)
@@ -117,9 +191,9 @@ int main(int argc, char** argv)
     }
 	int size = 800;
 	if(argc >= 4)
-		size = atoi(argc[3]);
+		size = atoi(argv[3]);
 
-	process(argc[1], argc[2], size);
+	process(argv[1], argv[2], size);
 
     return 0;
 }
