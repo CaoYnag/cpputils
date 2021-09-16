@@ -48,6 +48,10 @@ namespace spes::color
 		u8 bb = a.b * sp + s * b.b;
 		return color_t(rr, gg, bb, a.a);
 	}
+	color_t operator*(const color_t& a, float s)
+	{
+		return color_t(a.r * s, a.g * s, a.b * s, a.a * s);
+	}
 	color_t operator-(const color_t& a, const color_t& b)
 	{
 		u8 aa = a.a < b.a ? a.a : b.a;
@@ -71,7 +75,6 @@ namespace spes::color
 	    os << buff;
 	    return os;
     }
-
 
 	color_t Colors::BLACK	= 0xff000000;
 	color_t Colors::WHITE	= 0xffffffff;

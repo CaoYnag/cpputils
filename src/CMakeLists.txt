@@ -8,6 +8,7 @@ set(SRC
     ${PROJECT_SOURCE_DIR}/algo.cpp
     ${PROJECT_SOURCE_DIR}/math.cpp
     ${PROJECT_SOURCE_DIR}/color.cpp
+	${PROJECT_SOURCE_DIR}/color_gradient.cpp
     ${PROJECT_SOURCE_DIR}/image.cpp
     ${PROJECT_SOURCE_DIR}/canvas.cpp
     ${PROJECT_SOURCE_DIR}/canvas_func.cpp

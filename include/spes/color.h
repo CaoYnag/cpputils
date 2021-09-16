@@ -1,7 +1,11 @@
 #pragma once
 #include "type.h"
 #include <initializer_list>
+#include <vector>
 #include <iostream>
+#include <tuple>
+using std::tuple;
+using std::vector;
 using namespace spes;
 
 namespace spes::color
@@ -34,11 +38,13 @@ namespace spes::color
 	color_t operator+(const color_t& a, const color_t& b);
 	/* merge color with alpha */
 	color_t operator*(const color_t& a, const color_t& b);
+	/* clamp color */
+	color_t operator*(const color_t& a, float s);
 	color_t operator-(const color_t& a, const color_t& b);
     bool operator==(const color_t& a, const color_t& b);
     bool operator!=(const color_t& a, const color_t& b);
 	std::ostream& operator<<(std::ostream& os, const color_t& c);
-
+	
 	class Colors
 	{
 	public:
@@ -60,4 +66,15 @@ namespace spes::color
 
 	hsv_t to_hsv(const color_t& c);
 	color_t from_hsv(const hsv_t& c);
+
+	/* Clamp Color */
+	class ColorGradient
+	{
+		vector<tuple<double, color_t>> _colors;
+	public:
+		ColorGradient(const vector<color_t>& colors);
+		ColorGradient(const vector<tuple<double, color_t>>& colors);
+
+		color_t clamp(double s);
+	};
 }

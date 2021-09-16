@@ -81,3 +81,13 @@ BOOST_AUTO_TEST_CASE(alpha)
 	BOOST_REQUIRE_EQUAL(c2.r, 255);
 	BOOST_REQUIRE_EQUAL(c2.a, 255);
 }
+
+BOOST_AUTO_TEST_CASE(gradient)
+{
+	vector<color_t> cs {Colors::WHITE, Colors::BLACK};
+	ColorGradient cg(cs);
+	BOOST_REQUIRE_EQUAL(Colors::WHITE, cg.clamp(.0));
+	BOOST_REQUIRE_EQUAL(Colors::BLACK, cg.clamp(1));
+	BOOST_REQUIRE_EQUAL(color_t(229, 229, 229), cg.clamp(.1)); // 255 + (0 - 255) * .1 = 255 + (-26)
+	BOOST_REQUIRE_EQUAL(color_t(204, 204, 204), cg.clamp(.2)); // 255 - 51
+}

@@ -1,6 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-
-project(test_color)
+project(heatmap)
 
 if(WIN32)
 	if($ENV{LIB_BASE})
@@ -20,8 +19,8 @@ if(WIN32)
 endif()
 
 set(SRC
-    ${PROJECT_SOURCE_DIR}/test.cpp
+    ${PROJECT_SOURCE_DIR}/src.cpp
 )
 
-add_executable(test_color ${SRC})
-target_link_libraries(test_color spes)
+add_executable(${PROJECT_NAME} ${SRC})
+target_link_libraries(${PROJECT_NAME} utils)
