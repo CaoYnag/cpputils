@@ -32,7 +32,7 @@ struct HeatData
 
 struct HMConf
 {
-	double min_rad, max_rad;
+	double min_rad, max_rad; // conf in pix. trans to coord
 	double max_heat; // heat value reach max render intensity
 	shared_ptr<ColorGradient> cg;
 };
@@ -83,7 +83,7 @@ void load_data(const string& path, vector<HeatData>& data)
 	}
 }
 
-void process_data(const string& path, int size, const HMConf& conf, vector<HeatData>& data, MapStats& stats)
+void process_data(const string& path, int size, HMConf& conf, vector<HeatData>& data, MapStats& stats)
 {
 	load_data(path, data);
 	stats.minx = 99999;
@@ -104,27 +104,42 @@ void process_data(const string& path, int size, const HMConf& conf, vector<HeatD
 		if(d.heat > stats.maxh) stats.maxh = d.heat;
 	}
 
-	stats.minx -= conf.max_rad;
-	stats.maxx += conf.max_rad;
-	stats.miny -= conf.max_rad;
-	stats.maxy += conf.max_rad;
+
+
+	int rs = size - conf.max_rad * 2;
 	stats.ww = stats.maxx - stats.minx;
 	stats.hh = stats.maxy - stats.miny;
+	double pre = .0;
+	
 	if(stats.ww > stats.hh)
 	{
 		stats.width = size;
 		stats.height = size * stats.hh / stats.ww;
+		pre = stats.ww / rs;
 	}
 	else
 	{
 		stats.height = size;
 		stats.width = size * stats.ww / stats.hh;
+		pre = stats.hh / rs;
 	}
+
+	conf.max_rad *= pre;
+	conf.min_rad *= pre;
+	stats.minx -= conf.max_rad;
+	stats.maxx += conf.max_rad;
+	stats.miny -= conf.max_rad;
+	stats.maxy += conf.max_rad;
+	
+	stats.ww = stats.maxx - stats.minx;
+	stats.hh = stats.maxy - stats.miny;
 }
 
 double intensity(double x, double y, const HeatData& data, const HMConf& conf)
 {
-	double dist = sqrt(x * data.x + y * data.y);
+	x -= data.x;
+	y -= data.y;
+	double dist = sqrt(x * x + y * y);
 	if(dist >= conf.max_rad) return .0;
 	return data.heat * (conf.max_rad - dist) / conf.max_rad;
 }
@@ -158,42 +173,64 @@ shared_ptr<image_t> render(const MapStats& stats, const HMConf& conf, const vect
 	{
 		int x = i % wid;
 		int y = i / wid;
-		buf[i] = heat2color(intensity(x, y, data, conf), conf);
+		double xx, yy;
+		coord_trans(x, y, xx, yy, stats);
+		buf[i] = heat2color(intensity(xx, yy, data, conf), conf);
 	}
 	
 	return im;
 }
-void process(const string& src, const string& dst, int size)
+
+void draw_cg_strip(shared_ptr<ColorGradient> cg)
+{
+	auto im = make_shared<image_t>();
+
+	int wid = 512;
+	int hgt = 64;
+	im->init(wid, hgt);
+	auto buf = im->buffer();
+	for(int x = 0; x < wid; ++x)
+	{
+		auto c = cg->clamp((x + .0) / wid).c;
+		for(int y = 0; y < 64; ++y)
+			buf[x + y * wid] = c;
+	}
+	image_io::write(im, "strip.png", IMAGE_FMT_PNG);
+	
+}
+void process(const string& src, const string& conf_path, const string& dst, int size)
 {
 	vector<HeatData> data;
 	MapStats stats;
 	HMConf conf;
 
-	load_conf("hm.conf", conf);
+	load_conf(conf_path, conf);
 	process_data(src, size, conf, data, stats);
 	{
 		// do some log here
-		printf("world bnds: (%f %f %f %f)\n", stats.minx, stats.miny, stats.maxx, stats.maxy);
-		printf("heat range: (%f %f)\n", stats.minh, stats.maxh);
+		printf("world bnds: (%lf %lf %lf %lf)\n", stats.minx, stats.miny, stats.maxx, stats.maxy);
+		printf("world size: (%lf %lf)\n", stats.ww, stats.hh);
+		printf("heat range: (%lf %lf)\n", stats.minh, stats.maxh);
 		printf("image size: (%d %d)\n", stats.width, stats.height);
-		printf("conf: rad (%f %f) heat: %f\n", conf.min_rad, conf.max_rad, conf.max_heat);
+		printf("conf: rad (%lf %lf) heat: %f\n", conf.min_rad, conf.max_rad, conf.max_heat);
 	}
+	draw_cg_strip(conf.cg);
 	auto im = render(stats, conf, data);
-	image_io::write(im, dst.c_str());
+	image_io::write(im, dst.c_str(), IMAGE_FMT_PNG);
 }
 
 int main(int argc, char** argv)
 {
-    if(argc < 3)
+    if(argc < 4)
     {
-        cerr << "Usage: heatmap src dst size" << endl;
+        cerr << "Usage: heatmap src conf dst size" << endl;
         return 0;
     }
 	int size = 800;
-	if(argc >= 4)
-		size = atoi(argv[3]);
+	if(argc >= 5)
+		size = atoi(argv[4]);
 
-	process(argv[1], argv[2], size);
+	process(argv[1], argv[2], argv[3], size);
 
     return 0;
 }

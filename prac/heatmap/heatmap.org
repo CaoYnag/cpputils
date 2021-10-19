@@ -1,0 +1,16 @@
+* Performance
+use ranbow.conf
+use alipay_happyvaley, 3261 point
+
+| data   | size |   real |   user |   sys |
+| alipay |  800 | 19.202 | 19.187 | 0.003 |
+| alipay |  600 | 10.769 | 10.760 | 0.004 |
+| alipay |  400 |  4.858 |  4.835 | 0.013 |
+| alipay |  200 |  1.313 |  1.292 | 0.020 |
+| gaode  |  800 |  4.574 |  4.561 | 0.011 |
+| gaode  |  600 |  2.607 |  2.606 | 0.000 |
+| gaode  |  400 |  1.201 |  1.190 | 0.010 |
+| gaode  |  200 |  0.328 |  0.321 | 0.007 |
+
+
+

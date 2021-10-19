@@ -75,6 +75,6 @@ namespace spes::color
 		ColorGradient(const vector<color_t>& colors);
 		ColorGradient(const vector<tuple<double, color_t>>& colors);
 
-		color_t clamp(double s);
+		color_t clamp(double s) const;
 	};
 }

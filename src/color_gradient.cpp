@@ -11,7 +11,7 @@ namespace spes::color
 			throw runtime_error("bad color gradient param, 1 or more color is needed!");
 		double s = 1.0;
 		if(colors.size() > 1)
-			s = 1 / (colors.size() - 1);
+			s = 1.0 / (colors.size() - 1);
 		double ss = 0;
 		for(auto& c : colors)
 		{
@@ -26,7 +26,7 @@ namespace spes::color
 			throw runtime_error("bad color gradient param, 1 or more color is needed!");
 	}
 
-	color_t ColorGradient::clamp(double s)
+	color_t ColorGradient::clamp(double s) const
 	{
 		if(_colors.size() == 1) return get<1>(_colors[0]);
 		if(s < 0) s = 0;
@@ -35,9 +35,12 @@ namespace spes::color
 		while(s > get<0>(_colors[e])) ++e;
 		int sidx = e - 1;
 		auto ss = get<0>(_colors[sidx]);
+		auto es = get<0>(_colors[e]);
 		auto sc = get<1>(_colors[sidx]);
 		auto ec = get<1>(_colors[e]);
 		s -= ss;
+		s /= (es - ss);
+		
 		return color_t(
 			sc.r + (ec.r - sc.r) * s,
 			sc.g + (ec.g - sc.g) * s,
