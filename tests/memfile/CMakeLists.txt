@@ -27,4 +27,4 @@ set(SRC
 )
 
 add_executable(test_memfile ${SRC})
-target_link_libraries(test_memfile utils)
+target_link_libraries(test_memfile spes)

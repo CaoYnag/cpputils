@@ -24,4 +24,4 @@ set(SRC
 )
 
 add_executable(test_clip ${SRC})
-target_link_libraries(test_clip utils)
+target_link_libraries(test_clip spes)

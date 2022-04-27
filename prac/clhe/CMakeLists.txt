@@ -23,4 +23,4 @@ set(SRC
 )
 
 add_executable(clhe ${SRC})
-target_link_libraries(clhe utils)
+target_link_libraries(clhe spes)

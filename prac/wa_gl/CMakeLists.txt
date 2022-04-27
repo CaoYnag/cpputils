@@ -24,4 +24,4 @@ set(SRC
 )
 
 add_executable(${PROJECT_NAME} ${SRC})
-target_link_libraries(${PROJECT_NAME} utils GL GLU glut)
+target_link_libraries(${PROJECT_NAME} spes GL GLU glut)

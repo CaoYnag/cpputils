@@ -39,18 +39,18 @@ namespace spes::image::io
 			return im;
 		}
 
-		int sig = 0;
+		//int sig = 0;
 		png_init_io(png, fp);
-		png_set_sig_bytes(png, sig);
+		//png_set_sig_bytes(png, sig);
 		png_read_png(png, info, PNG_TRANSFORM_EXPAND, nullptr);
-
-		png_bytep* rps = png_get_rows(png, info);
 
 		png_uint_32 w, h;
 		int dep, color_type, interlace_type;
 		png_get_IHDR(png, info, &w, &h, &dep, &color_type, &interlace_type, nullptr, nullptr);
 		im->init(w, h);
 		auto buff = im->buffer();
+
+		png_bytep* rps = png_get_rows(png, info);
 
 		u32 idx = 0;
 		for (u32 y = 0; y < h; ++y)

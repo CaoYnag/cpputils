@@ -24,4 +24,4 @@ set(SRC
 )
 
 add_executable(test_canvas ${SRC})
-target_link_libraries(test_canvas utils)
+target_link_libraries(test_canvas spes)

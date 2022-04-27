@@ -1,6 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-
-project(sh_gl)
+project(cui_im)
 
 if(WIN32)
 	if($ENV{LIB_BASE})
@@ -23,5 +22,5 @@ set(SRC
     ${PROJECT_SOURCE_DIR}/test.cpp
 )
 
-add_executable(sh_gl ${SRC})
-target_link_libraries(sh_gl spes GL GLU glut)
+add_executable(cui_im ${SRC})
+target_link_libraries(cui_im spes)

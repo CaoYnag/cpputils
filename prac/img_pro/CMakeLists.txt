@@ -23,4 +23,4 @@ set(SRC
 )
 
 add_executable(imgpro ${SRC})
-target_link_libraries(imgpro utils)
+target_link_libraries(imgpro spes)

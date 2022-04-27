@@ -24,4 +24,4 @@ set(SRC
 )
 
 add_executable(test_algo ${SRC})
-target_link_libraries(test_algo utils)
+target_link_libraries(test_algo spes)

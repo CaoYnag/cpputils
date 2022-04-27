@@ -24,4 +24,4 @@ set(SRC
 )
 
 add_executable(test_image ${SRC})
-target_link_libraries(test_image utils)
+target_link_libraries(test_image spes)

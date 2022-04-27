@@ -1,6 +1,6 @@
 #include <spes/io_jpeg.h>
 #include <cstdio>
-#include <png.h>
+#include "png.h"
 #include <jpeglib.h>
 #include <cstring>
 using namespace std;

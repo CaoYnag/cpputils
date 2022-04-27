@@ -1,3 +1,5 @@
+#include <cstdio>
+#include <fcntl.h>
 #include <spes/imageio.h>
 #include <spes/io_png.h>
 #include <spes/io_jpeg.h>
@@ -354,11 +356,11 @@ namespace spes::image::io
 		constexpr u32 BYTES_TO_READ = BYTES_TO_CHECK + 1;
 		char buff[BYTES_TO_READ];
 		fgets(buff, BYTES_TO_READ, fp);
+		fseek(fp, 0, SEEK_SET);
 		if (png_sig_check(buff, BYTES_TO_CHECK))
 			return IMAGE_FMT_PNG;
 		if (jpeg_sig_check(buff, BYTES_TO_CHECK))
 			return IMAGE_FMT_JPEG;
-
 		return IMAGE_FMT_UNKNOWN;
 	}
 	u32 image_format(const char* path)

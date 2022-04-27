@@ -23,4 +23,4 @@ set(SRC
 )
 
 add_executable(he ${SRC})
-target_link_libraries(he utils)
+target_link_libraries(he spes)
