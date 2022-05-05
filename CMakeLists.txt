@@ -2,8 +2,8 @@ cmake_minimum_required(VERSION 3.10)
 
 project(cpputils VERSION 1.0.0 LANGUAGES CXX)
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BUILD_RPATH})
-set(LIBRARY_OUTPUT_PATH ${CMAKE_BUILD_RPATH})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ".")
+set(LIBRARY_OUTPUT_PATH ".")
 
 option(BUILD_TESTS "build tests and unit_tests" ON)
 option(BUILD_SAMPLES "build some sample program" ON)

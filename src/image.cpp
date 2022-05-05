@@ -118,14 +118,17 @@ namespace spes::image
 
 	color_t image_t::get_pixel(int x, int y) const
 	{
-		if (_init)
-			return _buff[idx(x, y)];
-		else
-			return 0;
+		if (!_init) return 0;
+		if(x < 0) x = 0;
+		if(y < 0) y = 0;
+		if(x >= _w) x = _w - 1;
+		if(y >= _h) y = _h - 1;
+		return _buff[idx(x, y)];
 	}
 	void image_t::set_pixel(s32 x, s32 y, color_t c)
 	{
-		if (_init)
+		if (!_init) return;
+		if(x < 0 || y < 0 || x >= _w || y >= _h) return;
 		_buff[idx(x, y)] = c;
 	}
 
