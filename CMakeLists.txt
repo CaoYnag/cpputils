@@ -32,6 +32,7 @@ if(UNIX OR MINGW)
 	endif()
 endif()
 
+set(LIB_NAME spes)
 add_subdirectory(src)
 
 if(BUILD_TESTS)
@@ -42,7 +43,7 @@ endif()
 if(BUILD_SAMPLES)
 	add_subdirectory(prac)
 endif()
-install(TARGETS spes
+install(TARGETS ${LIB_NAME}
 		LIBRARY DESTINATION lib
 		RUNTIME DESTINATION bin)
 file(GLOB header_files "${PROJECT_SOURCE_DIR}/include/spes/*.h")

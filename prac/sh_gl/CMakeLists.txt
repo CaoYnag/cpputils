@@ -24,4 +24,4 @@ set(SRC
 )
 
 add_executable(sh_gl ${SRC})
-target_link_libraries(sh_gl spes GL GLU glut)
+target_link_libraries(sh_gl ${LIB_NAME} GL GLU glut)

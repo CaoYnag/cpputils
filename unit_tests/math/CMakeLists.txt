@@ -24,4 +24,4 @@ set(SRC
 )
 
 add_executable(test_math ${SRC})
-target_link_libraries(test_math spes)
+target_link_libraries(test_math ${LIB_NAME})

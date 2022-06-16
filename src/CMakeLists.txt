@@ -42,7 +42,6 @@ if(UNIX)
 	add_compile_options("-static")
 endif()
 
-set(LIB_NAME spes)
 add_library(${LIB_NAME} STATIC ${SRC})
 target_link_libraries(${LIB_NAME} png jpeg)
 if(WIN32)

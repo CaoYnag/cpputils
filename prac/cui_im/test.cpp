@@ -61,9 +61,9 @@ shared_ptr<image_t> resize(shared_ptr<image_t> im, int w, int h)
             if(ixe != xe) ++ixe;
             float a = .0f, r = .0f, g = .0f, b = .0f;
             for(int yy = iys; yy < iye; ++yy)
-            {
-                float ssy = isy;
-                if(yy == iys) ssy *= 1 + iys - ys;
+                {
+                    float ssy = isy;
+                    if(yy == iys) ssy *= 1 + iys - ys;
                 if(yy == iye) ssy *= 1 + ye - iye;
                 for(int xx = ixs; xx < ixe; ++xx)
                 {

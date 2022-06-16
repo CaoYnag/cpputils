@@ -24,4 +24,4 @@ set(SRC
 )
 
 add_executable(test_type ${SRC})
-target_link_libraries(test_type utils)
+target_link_libraries(test_type ${LIB_NAME})

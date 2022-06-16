@@ -23,4 +23,4 @@ set(SRC
 )
 
 add_executable(clahe ${SRC})
-target_link_libraries(clahe spes)
+target_link_libraries(clahe ${LIB_NAME})

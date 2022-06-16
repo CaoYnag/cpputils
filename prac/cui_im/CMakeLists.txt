@@ -23,4 +23,4 @@ set(SRC
 )
 
 add_executable(cui_im ${SRC})
-target_link_libraries(cui_im spes)
+target_link_libraries(cui_im ${LIB_NAME})

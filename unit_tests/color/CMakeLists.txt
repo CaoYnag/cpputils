@@ -24,4 +24,4 @@ set(SRC
 )
 
 add_executable(test_color ${SRC})
-target_link_libraries(test_color spes)
+target_link_libraries(test_color ${LIB_NAME})

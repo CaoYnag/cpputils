@@ -23,4 +23,4 @@ set(SRC
 )
 
 add_executable(ahe ${SRC})
-target_link_libraries(ahe spes)
+target_link_libraries(ahe ${LIB_NAME})

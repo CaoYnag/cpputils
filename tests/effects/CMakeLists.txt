@@ -24,4 +24,4 @@ set(SRC
 )
 
 add_executable(test_effects ${SRC})
-target_link_libraries(test_effects spes)
+target_link_libraries(test_effects ${LIB_NAME})

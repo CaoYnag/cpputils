@@ -23,4 +23,4 @@ set(SRC
 )
 
 add_executable(${PROJECT_NAME} ${SRC})
-target_link_libraries(${PROJECT_NAME} spes)
+target_link_libraries(${PROJECT_NAME} ${LIB_NAME})

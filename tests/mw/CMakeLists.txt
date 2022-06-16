@@ -35,4 +35,4 @@ set(SRC
 )
 
 add_executable(test_mw ${SRC})
-target_link_libraries(test_mw spes ${FC_DEP_LIBS})
+target_link_libraries(test_mw ${LIB_NAME} ${FC_DEP_LIBS})
