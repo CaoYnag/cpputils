@@ -4,27 +4,21 @@
 #include "canvas.h"
 #include <vector>
 #include <functional>
-using namespace std;
-using namespace spes;
-using namespace spes::image;
-using namespace spes::math;
 
-namespace spes::canvas
-{
-	typedef function<f32(f32)> func;
-	class FuncCanvas : public Canvas
-	{
-	public:
-		FuncCanvas(size2d&, range2d&);
-		FuncCanvas(size2d&, size2d&, range2d&);
-		virtual ~FuncCanvas();
-		
-		void background(color_t);
-		void background(shared_ptr<image_t>);
-		void axis(bool draw, color_t c = Colors::BLACK);
-		void color(color_t);
-		void x_range(range2d&);
-		void y_range(range2d&);
-		void func(func);
-	};
-}
+namespace spes::canvas {
+typedef std::function<f32(f32)> func;
+class FuncCanvas : public Canvas {
+public:
+    FuncCanvas(spes::math::size2d&, spes::math::range2d&);
+    FuncCanvas(spes::math::size2d&, spes::math::size2d&, spes::math::range2d&);
+    virtual ~FuncCanvas();
+
+    void background(spes::color::color_t);
+    void background(std::shared_ptr<spes::image::image_t>);
+    void axis(bool draw, spes::color::color_t c = spes::color::Colors::BLACK);
+    void color(spes::color::color_t);
+    void x_range(spes::math::range2d&);
+    void y_range(spes::math::range2d&);
+    void func(func);
+};
+} // namespace spes::canvas

@@ -6,17 +6,16 @@
 #include <conio.h>
 using namespace std;
 using namespace spes;
+using namespace spes::color;
 using namespace spes::image;
 using namespace spes::image::io;
 
-void test1()
-{
-
+void test1() {
 #ifdef WIN32
     const char* png_path = "D:\\temp\\img_pro\\interlude_01.png";
-	const char* png_write_path = "D:\\temp\\img_pro\\png_write_test.png";
-	const char* jpeg_path = "D:\\temp\\img_pro\\ac_morty.jpg";
-	const char* jpeg_write_path = "D:\\temp\\img_pro\\jpeg_write_test.jpg";
+    const char* png_write_path = "D:\\temp\\img_pro\\png_write_test.png";
+    const char* jpeg_path = "D:\\temp\\img_pro\\ac_morty.jpg";
+    const char* jpeg_write_path = "D:\\temp\\img_pro\\jpeg_write_test.jpg";
 #endif
 #ifdef __unix__
     const char* png_path = "/home/spes/Pictures/wp_sel/13517568-2edda26680447bb2.png";
@@ -53,12 +52,9 @@ void test1()
 
     cout << "Reading jpeg file " << jpeg_path << endl;
     auto jim = image_io::read(jpeg_path);
-    if (!jim)
-    {
+    if (!jim) {
         cout << "err read im " << jpeg_path << endl;
-    }
-    else
-    {
+    } else {
         cout << "img size (" << jim->width() << " * " << jim->height() << ")" << endl;
         image_io::show_image(jim, "Jpeg Image");
         image_io::write(jim, jpeg_write_path, IMAGE_FMT_JPEG);
@@ -69,13 +65,12 @@ void test1()
     {
         buff[i] = buff[i].grey(255 - buff[i].grey());
     }*/
-    //image_io::show_image(im);
+    // image_io::show_image(im);
     getch();
 }
 
-void test2()
-{
-    auto shit = image_io::read("/home/spes/Resource/res/yuutsu.jpg");// 165x177
+void test2() {
+    auto shit = image_io::read("/home/spes/Resource/res/yuutsu.jpg"); // 165x177
     auto im = make_shared<image_t>();
     im->init(600, 600);
     im->set_pixels(shit, -100, -100);
@@ -91,16 +86,15 @@ void test2()
     image_io::write(sub3, "/home/spes/temp/image_sub3.jpg", IMAGE_FMT_JPEG);
 }
 
-void test_hsv()
-{
+void test_hsv() {
     printf("hsv size: %ld\n", sizeof(hsv_t));
-    auto shit = image_io::read("/home/spes/Resource/res/yuutsu.jpg");// 165x177
+    auto    shit = image_io::read("/home/spes/Resource/res/yuutsu.jpg"); // 165x177
     color_t first = shit->buffer()[0];
-    auto hsv = to_hsv(first);
-    auto buff = image_transform(shit, IMP_FMT_HSV);
-    hsv_t* hsvbuff = (hsv_t*)buff->buff;
-    auto hsvfirst = hsvbuff[0];
-    auto c = from_hsv(hsvfirst);
+    auto    hsv = to_hsv(first);
+    auto    buff = image_transform(shit, IMP_FMT_HSV);
+    hsv_t*  hsvbuff = (hsv_t*)buff->buff;
+    auto    hsvfirst = hsvbuff[0];
+    auto    c = from_hsv(hsvfirst);
     printf("equals: %d, hsv first: (%.2f, %.2f, %.2f), to hsv(%.2f, %.2f, %.2f)\n",
            (c == first), hsvfirst.h, hsvfirst.s, hsvfirst.v,
            hsv.h, hsv.s, hsv.v);
@@ -110,19 +104,17 @@ void test_hsv()
 }
 
 /* render transparent img */
-void test3()
-{
-	auto sakura = image_io::read("/home/spes/temp/sakura512.png");
-	auto base = image_io::read("/home/spes/temp/avatar.png");
-	base->draw_img(sakura, 0, 0);
-	image_io::write(base, "/home/spes/temp/alpha_test.png", IMAGE_FMT_PNG);
+void test3() {
+    auto sakura = image_io::read("/home/spes/temp/sakura512.png");
+    auto base = image_io::read("/home/spes/temp/avatar.png");
+    base->draw_img(sakura, 0, 0);
+    image_io::write(base, "/home/spes/temp/alpha_test.png", IMAGE_FMT_PNG);
 }
 
-int main(int argc, char* argv[])
-{
-    //test1();
-    //test2();
-    //test_hsv();
+int main(int argc, char* argv[]) {
+    // test1();
+    // test2();
+    // test_hsv();
     test3();
-	return 0;
+    return 0;
 }

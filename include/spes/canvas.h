@@ -4,51 +4,52 @@
 #include "math.h"
 #include "image.h"
 #include <vector>
-using namespace spes;
-using namespace spes::math;
-using namespace spes::color;
-using namespace spes::image;
 
-namespace spes::canvas
-{
-	/*
-	for paramter points: p1, p2, p3, p4 ... pn
-	*/
-	enum CANVAS_RENDER_MODE
-	{
-		CRM_None,
-		/* just draw p1, p2 ... pn */
-		CRM_Points,
-		/* draw [p1, p2], [p3, p4] ... [pn-1, pn], and n must be an odd number */
-		CRM_LineSegments,
-		/* draw [p1, p2, p3 ... pn] */
-		CRM_LineStrip,
-		/* draw [p1, p2, p3 ... pn, p1] */
-		CRM_LineRing
-	};
-	class Canvas
-	{
-	protected:
-		std::shared_ptr<image_t> _im;
-		u64 _size;
-		color_t* _buff;
-		rect _rc;
-		size2d _sz;
+namespace spes::canvas {
+/*
+for paramter points: p1, p2, p3, p4 ... pn
+*/
+enum CANVAS_RENDER_MODE {
+    CRM_None,
+    /* just draw p1, p2 ... pn */
+    CRM_Points,
+    /* draw [p1, p2], [p3, p4] ... [pn-1, pn], and n must be an odd number */
+    CRM_LineSegments,
+    /* draw [p1, p2, p3 ... pn] */
+    CRM_LineStrip,
+    /* draw [p1, p2, p3 ... pn, p1] */
+    CRM_LineRing
+};
+class Canvas {
+protected:
+    std::shared_ptr<spes::image::image_t> _im;
+    u64                                   _size;
+    spes::color::color_t*                 _buff;
+    spes::math::rect                      _rc;
+    spes::math::size2d                    _sz;
 
-		inline u32 idx(u32 x, u32 y) const { return x + y * _im->width(); }
-		inline u32 idx(const point2d& p) const { return p.x + p.y * _im->width(); }
-	public:
-		Canvas(u32 w, u32 h, color_t bk = Colors::WHITE);
-		Canvas(shared_ptr<image_t> im);
-		virtual ~Canvas();
+    inline u32 idx(u32 x, u32 y) const {
+        return x + y * _im->width();
+    }
+    inline u32 idx(const spes::math::point2d& p) const {
+        return p.x + p.y * _im->width();
+    }
 
-		inline shared_ptr<image_t> image() { return _im; }
-	public:
-		virtual void draw(u32 mode, const std::vector<point2d>& pts, color_t c = Colors::BLACK);
-		virtual void draw_point(const point2d& p, color_t c = Colors::BLACK);
-		virtual void draw_line(const line2d& l, color_t c = Colors::BLACK);
-		virtual void draw_rect(const rect& rec, color_t c = Colors::BLACK);
-		virtual void draw_triangle(const std::vector<point2d>& tri, color_t c = Colors::BLACK);
-		virtual void draw_polygon(const polygon2d& poly, color_t c = Colors::BLACK);
-	};
-}
+public:
+    Canvas(u32 w, u32 h, spes::color::color_t bk = spes::color::Colors::WHITE);
+    Canvas(std::shared_ptr<spes::image::image_t> im);
+    virtual ~Canvas();
+
+    inline std::shared_ptr<spes::image::image_t> image() {
+        return _im;
+    }
+
+public:
+    virtual void draw(u32 mode, const std::vector<spes::math::point2d>& pts, spes::color::color_t c = spes::color::Colors::BLACK);
+    virtual void draw_point(const spes::math::point2d& p, spes::color::color_t c = spes::color::Colors::BLACK);
+    virtual void draw_line(const spes::math::line2d& l, spes::color::color_t c = spes::color::Colors::BLACK);
+    virtual void draw_rect(const spes::math::rect& rec, spes::color::color_t c = spes::color::Colors::BLACK);
+    virtual void draw_triangle(const std::vector<spes::math::point2d>& tri, spes::color::color_t c = spes::color::Colors::BLACK);
+    virtual void draw_polygon(const spes::math::polygon2d& poly, spes::color::color_t c = spes::color::Colors::BLACK);
+};
+} // namespace spes::canvas
