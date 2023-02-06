@@ -1,7 +1,7 @@
 #include <spes/utils.h>
 #ifdef __unix__
 #include <sys/time.h>
-#elif WIN32
+#elif _WIN32
 #include <Windows.h>
 #endif
 using namespace std;
@@ -12,7 +12,7 @@ long cur_ms()
     timeval tv;
     gettimeofday(&tv, nullptr);
     return tv.tv_sec * 1000 + tv.tv_usec / 1000;
-#elif WIN32
+#elif _WIN32
     return GetTickCount();
 #endif
 }

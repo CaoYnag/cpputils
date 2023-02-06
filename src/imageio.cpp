@@ -9,7 +9,7 @@
 #include <thread>
 #include <map>
 #include <mutex>
-#ifdef WIN32
+#ifdef _WIN32
 #include <Windows.h>
 #include <gl/glew.h>
 #endif
@@ -32,7 +32,7 @@ namespace spes::image::io
 	ImageViewer::~ImageViewer()
 	{}
 
-#ifdef WIN32
+#ifdef _WIN32
 	LRESULT CALLBACK IV_Wnd_Proc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 	class WindowsImageViewer : public ImageViewer
@@ -45,7 +45,7 @@ namespace spes::image::io
 		HGLRC _rc;
 		u32 _tex;
 	public:
-		WindowsImageViewer(const image_t& im, const string& tt) : ImageViewer(im, tt)
+		WindowsImageViewer(std::shared_ptr<image_t> im, const string& tt) : ImageViewer(im, tt)
 		{
 		}
 		virtual ~WindowsImageViewer()
@@ -310,7 +310,7 @@ namespace spes::image::io
 
 	size2d image_io::screen_size()
 	{
-#ifdef WIN32
+#ifdef _WIN32
 		RECT rect;
 		SystemParametersInfo(SPI_GETWORKAREA, 0, (void*)&rect, 0);
 		return { rect.right - rect.left + .0f, rect.bottom - rect.top - GetSystemMetrics(SM_CYCAPTION) + .0f };
@@ -334,7 +334,7 @@ namespace spes::image::io
 	ImageViewer* image_io::show_image(shared_ptr<image_t> im, string title)
 	{
 		ImageViewer* viewer = nullptr;
-#ifdef WIN32
+#ifdef _WIN32
 		viewer = new WindowsImageViewer(im, title);
 #endif
 #ifdef __unix__

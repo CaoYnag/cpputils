@@ -11,7 +11,7 @@ using namespace spes::image;
 using namespace spes::image::io;
 
 void test1() {
-#ifdef WIN32
+#ifdef _WIN32
     const char* png_path = "D:\\temp\\img_pro\\interlude_01.png";
     const char* png_write_path = "D:\\temp\\img_pro\\png_write_test.png";
     const char* jpeg_path = "D:\\temp\\img_pro\\ac_morty.jpg";
@@ -37,7 +37,7 @@ void test1() {
     image_io::write(mem, write_path);*/
 
 
-    /*cout << "Reading png file " << png_path << endl;
+    cout << "Reading png file " << png_path << endl;
     auto im = image_io::read(png_path);
     if (!im)
     {
@@ -45,11 +45,11 @@ void test1() {
     }
     else
     {
-        cout << "img size (" << im.width() << " * " << im.height() << ")" << endl;
-        image_io::show_image(im, "PNG Image");
+        cout << "img size (" << im->width() << " * " << im->height() << ")" << endl;
+        //image_io::show_image(im, "PNG Image");
         image_io::write(im, png_write_path);
-    }*/
-
+    }
+    /*
     cout << "Reading jpeg file " << jpeg_path << endl;
     auto jim = image_io::read(jpeg_path);
     if (!jim) {
@@ -59,7 +59,7 @@ void test1() {
         image_io::show_image(jim, "Jpeg Image");
         image_io::write(jim, jpeg_write_path, IMAGE_FMT_JPEG);
     }
-
+    */
     /*buff = im.buffer();
     for (int i = 0; i < im.width() * im.height(); ++i)
     {
@@ -112,9 +112,9 @@ void test3() {
 }
 
 int main(int argc, char* argv[]) {
-    // test1();
+    test1();
     // test2();
     // test_hsv();
-    test3();
+    // test3();
     return 0;
 }

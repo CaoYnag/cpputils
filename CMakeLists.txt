@@ -14,7 +14,7 @@ include_directories(
 		${PROJECT_SOURCE_DIR}/include
 )
 link_directories(
-		${PROJECT_SOURCE_DIR}/bindd
+		${PROJECT_SOURCE_DIR}/bin
 )
 
 if(WIN32 AND NOT MINGW)
