@@ -265,6 +265,6 @@ bool operator!(const image_t& im) {
 }
 
 bool operator!(shared_ptr<image_t> im) {
-    return !(im || im->valid());
+    return !(im && im->valid());
 }
 } // namespace spes::image
